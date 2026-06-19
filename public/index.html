@@ -1,0 +1,1988 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>My Love For You 💕</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --rose: #e8437a;
+        --rose-deep: #c2185b;
+        --rose-light: #ffd6e7;
+        --blush: #fff0f6;
+        --gold: #f0c070;
+        --cream: #fffaf8;
+        --text: #3a1a2e;
+        --nav-h: 64px;
+        --music-h: 64px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--blush);
+      }
+
+      /* ===== CANVAS ===== */
+      #fallingCanvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* ===== MUSIC BAR (top) ===== */
+      .music-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--music-h);
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px;
+        z-index: 300;
+        border-bottom: 1px solid rgba(232, 67, 122, 0.15);
+        box-shadow: 0 4px 20px rgba(194, 24, 91, 0.08);
+      }
+      .play-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        border: none;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(232, 67, 122, 0.4);
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      .play-btn:active {
+        transform: scale(0.93);
+      }
+      .song-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .song-title {
+        font-family: "Dancing Script", cursive;
+        font-size: 15px;
+        color: var(--rose-deep);
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .song-artist {
+        font-size: 10px;
+        color: var(--rose);
+        opacity: 0.75;
+      }
+      .progress-wrap {
+        flex: 1.2;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .progress-bar {
+        flex: 1;
+        height: 4px;
+        background: var(--rose-light);
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+        border-radius: 2px;
+        transition: width 0.5s linear;
+        pointer-events: none;
+      }
+      .time-text {
+        font-size: 10px;
+        color: var(--rose-deep);
+        min-width: 28px;
+        flex-shrink: 0;
+        font-variant-numeric: tabular-nums;
+      }
+      #yt-player {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        width: 1px;
+        height: 1px;
+      }
+
+      /* ===== BOTTOM NAV ===== */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: var(--nav-h);
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(20px);
+        display: flex;
+        border-top: 1px solid rgba(232, 67, 122, 0.12);
+        box-shadow: 0 -4px 20px rgba(194, 24, 91, 0.08);
+        z-index: 300;
+      }
+      .nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-radius: 0;
+        padding: 8px 4px;
+      }
+      .nav-btn:active {
+        background: rgba(232, 67, 122, 0.07);
+      }
+      .nav-btn .nav-icon {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .nav-btn .nav-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: #bbb;
+        letter-spacing: 0.03em;
+      }
+      .nav-btn.active .nav-label {
+        color: var(--rose);
+      }
+      .nav-btn.active .nav-icon {
+        filter: saturate(1.5);
+      }
+
+      /* ===== PAGE SYSTEM ===== */
+      .pages-wrap {
+        position: fixed;
+        top: var(--music-h);
+        bottom: var(--nav-h);
+        left: 0;
+        right: 0;
+        overflow: hidden;
+        z-index: 2;
+      }
+      .page {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        opacity: 0;
+        transform: translateX(40px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        pointer-events: none;
+      }
+      .page.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: all;
+      }
+      .page.exit-left {
+        opacity: 0;
+        transform: translateX(-40px);
+        pointer-events: none;
+      }
+
+      /* ===== PAGE: HOME ===== */
+      .home-page {
+        background: linear-gradient(
+          160deg,
+          #fff0f6 0%,
+          #ffd6e7 50%,
+          #ffb3cf 100%
+        );
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 24px 24px;
+        min-height: 100%;
+      }
+      .hero-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--rose);
+        opacity: 0.75;
+        margin-bottom: 16px;
+      }
+      .main-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(48px, 13vw, 96px);
+        color: var(--rose-deep);
+        line-height: 1;
+        font-style: italic;
+        animation: floatTitle 4s ease-in-out infinite;
+      }
+      @keyframes floatTitle {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      .main-title span {
+        font-style: normal;
+        color: var(--rose);
+      }
+      .subtitle {
+        font-family: "Dancing Script", cursive;
+        font-size: clamp(16px, 4vw, 24px);
+        color: var(--rose-deep);
+        margin-top: 14px;
+        opacity: 0.8;
+      }
+      .hearts-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        font-size: 28px;
+        margin-top: 32px;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+      }
+
+      /* ===== PAGE: PHOTOS ===== */
+      .photos-page {
+        padding: 28px 20px 24px;
+        background: white;
+        min-height: 100%;
+      }
+      .page-heading {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(26px, 7vw, 42px);
+        color: var(--rose-deep);
+        font-style: italic;
+        margin-bottom: 6px;
+      }
+      .page-sub {
+        font-size: 12px;
+        color: var(--rose);
+        opacity: 0.7;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+
+      .slideshow-wrap {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        aspect-ratio: 4/3;
+        background: linear-gradient(135deg, var(--rose-light), #ffaecf);
+        box-shadow: 0 16px 56px rgba(194, 24, 91, 0.22);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+      }
+      .slide.active {
+        opacity: 1;
+      }
+      .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .slide-placeholder {
+        text-align: center;
+        color: var(--rose);
+        font-family: "Dancing Script", cursive;
+        font-size: 24px;
+      }
+      .slide-placeholder .emoji {
+        font-size: 64px;
+        display: block;
+        margin-bottom: 8px;
+      }
+      .slide-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(194, 24, 91, 0.65));
+        padding: 36px 20px 16px;
+        font-family: "Dancing Script", cursive;
+        font-size: 20px;
+        color: white;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+      }
+      .slide-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .slide-dots {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 200px;
+      }
+      .photos-page {
+        padding: 28px 20px 24px;
+        background: white;
+        min-height: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+      .photos-page::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 182, 193, 0.16) 0%,
+            transparent 18%
+          ),
+          radial-gradient(
+            circle at 85% 15%,
+            rgba(255, 105, 180, 0.14) 0%,
+            transparent 16%
+          ),
+          radial-gradient(
+            circle at 50% 80%,
+            rgba(255, 223, 241, 0.16) 0%,
+            transparent 22%
+          );
+        opacity: 0.65;
+        pointer-events: none;
+        animation: loveGlow 12s linear infinite;
+      }
+      .photos-page::after {
+        content: "💗 💕 💝 💖 💓 💗 💕";
+        position: absolute;
+        top: 110%;
+        left: -20%;
+        width: 140%;
+        height: 120%;
+        font-size: 22px;
+        color: rgba(232, 67, 122, 0.08);
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        justify-content: space-between;
+        opacity: 0.35;
+        pointer-events: none;
+        animation: heartsDrift 28s linear infinite;
+      }
+      @keyframes loveGlow {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        50% {
+          transform: translate3d(0, 8px, 0);
+        }
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+      }
+      @keyframes heartsDrift {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        100% {
+          transform: translate3d(10%, -60%, 0);
+        }
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--rose-light);
+        transition:
+          background 0.3s,
+          transform 0.3s;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .dot.active {
+        background: var(--rose);
+        transform: scale(1.5);
+      }
+
+      .photo-grid {
+        display: none;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 20px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .photo-thumb-item {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+      }
+      .photo-thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s;
+      }
+      .photo-thumb-item:active img {
+        transform: scale(0.96);
+      }
+      .photo-thumb-item.sel::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        background: rgba(232, 67, 122, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ===== PAGE: MESSAGE ===== */
+      .message-page {
+        padding: 28px 20px 24px;
+        background: linear-gradient(135deg, #fff0f6, #ffd6e7);
+        min-height: 100%;
+      }
+      .message-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px 28px;
+        max-width: 600px;
+        margin: 0 auto;
+        box-shadow: 0 12px 48px rgba(194, 24, 91, 0.14);
+        border: 1.5px solid rgba(232, 67, 122, 0.12);
+        position: relative;
+      }
+      .message-deco {
+        position: absolute;
+        font-size: 64px;
+        opacity: 0.05;
+        font-family: serif;
+        line-height: 1;
+        color: var(--rose-deep);
+      }
+      .message-deco.tl {
+        top: 12px;
+        left: 18px;
+      }
+      .message-deco.br {
+        bottom: 12px;
+        right: 18px;
+        transform: rotate(180deg);
+      }
+      .message-text {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(17px, 4vw, 22px);
+        color: var(--rose-deep);
+        line-height: 2;
+        font-style: italic;
+        white-space: pre-line;
+      }
+      .gold-line {
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--gold), var(--rose-light));
+        margin: 20px 0;
+        border-radius: 2px;
+      }
+      .message-sig {
+        font-family: "Dancing Script", cursive;
+        font-size: 26px;
+        color: var(--rose);
+        font-weight: 700;
+      }
+
+      /* ===== PAGE: VIDEOS ===== */
+      .videos-page {
+        padding: 28px 20px 24px;
+        background: var(--cream);
+        min-height: 100%;
+      }
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 18px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .video-card {
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 6px 24px rgba(194, 24, 91, 0.1);
+        border: 1px solid rgba(232, 67, 122, 0.08);
+      }
+      .video-thumb {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: linear-gradient(135deg, var(--rose-light), #ffaecf);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .video-thumb video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .video-play-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.12);
+      }
+      .play-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--rose);
+      }
+      .video-info {
+        padding: 14px 16px 16px;
+      }
+      .video-title {
+        font-family: "Dancing Script", cursive;
+        font-size: 18px;
+        color: var(--rose-deep);
+        margin-bottom: 10px;
+      }
+      .comments-area {
+        border-top: 1px solid var(--rose-light);
+        padding-top: 10px;
+      }
+      .comment-list {
+        max-height: 100px;
+        overflow-y: auto;
+        margin-bottom: 8px;
+      }
+      .comment-item {
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(232, 67, 122, 0.07);
+        font-size: 13px;
+      }
+      .comment-author {
+        font-weight: 600;
+        color: var(--rose);
+        margin-right: 5px;
+        font-size: 11px;
+      }
+      .comment-form {
+        display: flex;
+        gap: 6px;
+      }
+      .comment-input {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: 1.5px solid var(--rose-light);
+        font-size: 13px;
+        outline: none;
+      }
+      .comment-input:focus {
+        border-color: var(--rose);
+      }
+      .comment-btn {
+        padding: 8px 12px;
+        border-radius: 20px;
+        background: var(--rose);
+        color: white;
+        border: none;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .no-content {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--rose);
+        opacity: 0.5;
+        font-family: "Dancing Script", cursive;
+        font-size: 22px;
+      }
+      .no-content .emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      /* ===== VIDEO MODAL ===== */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.88);
+        z-index: 500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal-inner {
+        background: #000;
+        border-radius: 16px;
+        max-width: 680px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+      }
+      .modal-video {
+        width: 100%;
+        aspect-ratio: 16/9;
+      }
+      .modal-video video {
+        width: 100%;
+        height: 100%;
+      }
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.88);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ===== ADMIN TRIGGER ===== */
+      .admin-trigger {
+        position: fixed;
+        bottom: calc(var(--nav-h) + 12px);
+        right: 14px;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        font-size: 18px;
+        z-index: 150;
+        cursor: pointer;
+        opacity: 0.25;
+        transition: opacity 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .admin-trigger:hover,
+      .admin-trigger:active {
+        opacity: 1;
+      }
+
+      /* ===== ADMIN PANEL ===== */
+      .admin-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 400;
+        display: none;
+      }
+      .admin-overlay.open {
+        display: block;
+      }
+      .admin-panel {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: min(460px, 100vw);
+        background: white;
+        box-shadow: -8px 0 40px rgba(0, 0, 0, 0.18);
+        z-index: 401;
+        transform: translateX(100%);
+        transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-panel.open {
+        transform: translateX(0);
+      }
+
+      /* Admin header */
+      .admin-header {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        color: white;
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .admin-header-text h2 {
+        font-family: "Dancing Script", cursive;
+        font-size: 26px;
+      }
+      .admin-header-text p {
+        font-size: 11px;
+        opacity: 0.8;
+        margin-top: 2px;
+      }
+      .admin-close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Admin tabs */
+      .admin-tabs {
+        display: flex;
+        border-bottom: 1px solid rgba(232, 67, 122, 0.15);
+        flex-shrink: 0;
+        background: white;
+        overflow-x: auto;
+      }
+      .admin-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .admin-tab {
+        flex: 1;
+        min-width: 60px;
+        padding: 12px 6px 10px;
+        border: none;
+        background: none;
+        font-size: 11px;
+        color: #aaa;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+      .admin-tab .tab-icon {
+        font-size: 18px;
+      }
+      .admin-tab.active {
+        color: var(--rose);
+        border-bottom-color: var(--rose);
+      }
+
+      /* Admin login */
+      #adminLogin {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      #adminLogin .admin-login-body {
+        flex: 1;
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        justify-content: center;
+      }
+      #adminLogin h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 22px;
+        color: var(--rose-deep);
+      }
+
+      /* Admin tab content */
+      #adminContent {
+        display: none;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+      }
+      .admin-tab-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Admin form elements */
+      .admin-input {
+        width: 100%;
+        padding: 11px 14px;
+        border-radius: 12px;
+        border: 1.5px solid var(--rose-light);
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        margin-bottom: 10px;
+        transition: border-color 0.2s;
+      }
+      .admin-input:focus {
+        border-color: var(--rose);
+      }
+      .admin-textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1.5px solid var(--rose-light);
+        font-size: 14px;
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        outline: none;
+        resize: vertical;
+        min-height: 140px;
+        margin-bottom: 10px;
+        color: var(--rose-deep);
+        line-height: 1.8;
+      }
+      .admin-textarea:focus {
+        border-color: var(--rose);
+      }
+      .admin-btn {
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        color: white;
+        border: none;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 8px;
+        transition: opacity 0.2s;
+      }
+      .admin-btn:active {
+        opacity: 0.85;
+      }
+      .admin-btn.secondary {
+        background: transparent;
+        color: var(--rose);
+        border: 1.5px solid var(--rose);
+      }
+      .admin-btn.danger {
+        background: linear-gradient(135deg, #ff4444, #cc0000);
+      }
+      .admin-file-label {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        border: 2px dashed var(--rose);
+        color: var(--rose);
+        text-align: center;
+        cursor: pointer;
+        margin-bottom: 10px;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+      .admin-file-label:active {
+        background: var(--rose-light);
+      }
+      .admin-section-title {
+        font-family: "Playfair Display", serif;
+        font-size: 17px;
+        color: var(--rose-deep);
+        margin-bottom: 14px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--rose-light);
+      }
+
+      /* Admin item lists */
+      .admin-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .admin-list-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: #fff7fa;
+        border-radius: 12px;
+        border: 1px solid rgba(232, 67, 122, 0.1);
+      }
+      .admin-list-thumb {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: var(--rose-light);
+      }
+      .admin-list-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .admin-list-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--rose-deep);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .admin-list-sub {
+        font-size: 11px;
+        color: #aaa;
+        margin-top: 2px;
+      }
+      .admin-del-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 68, 68, 0.1);
+        border: none;
+        color: #ff4444;
+        font-size: 14px;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+      .admin-del-btn:active {
+        background: rgba(255, 68, 68, 0.25);
+      }
+
+      /* Song active badge */
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 600;
+        background: #e8f5e9;
+        color: #2e7d32;
+        margin-left: 6px;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        top: calc(var(--music-h) + 12px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--rose-deep);
+        color: white;
+        padding: 10px 22px;
+        border-radius: 20px;
+        font-size: 14px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+
+      /* Helpers */
+      .label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--rose);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        display: block;
+      }
+
+      @media (max-width: 380px) {
+        .progress-wrap {
+          display: none;
+        }
+        .main-title {
+          font-size: 44px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fallingCanvas"></canvas>
+    <div id="yt-player"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- VIDEO MODAL -->
+    <div class="modal-overlay" id="videoModal" onclick="closeModal(event)">
+      <div class="modal-inner">
+        <button
+          class="modal-close"
+          onclick="
+            document.getElementById('videoModal').classList.remove('open');
+            document.getElementById('modalVideo').pause();
+          "
+        >
+          ✕
+        </button>
+        <div class="modal-video">
+          <video id="modalVideo" controls playsinline></video>
+        </div>
+      </div>
+    </div>
+
+    <!-- MUSIC BAR -->
+    <div class="music-bar">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <div class="song-info">
+        <div class="song-title" id="songTitle">Loading...</div>
+        <div class="song-artist" id="songArtist">♪</div>
+      </div>
+      <div class="progress-wrap">
+        <span class="time-text" id="curTime">0:00</span>
+        <div class="progress-bar" id="progressBar" onclick="seekTo(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="time-text" id="durTime">0:00</span>
+      </div>
+    </div>
+
+    <!-- PAGES -->
+    <div class="pages-wrap">
+      <!-- HOME -->
+      <div class="page active" id="page-home">
+        <div class="home-page">
+          <div class="hero-eyebrow">a love story — just for you</div>
+          <h1 class="main-title">You Are My<br /><span>Everything</span></h1>
+          <p class="subtitle" id="heroSongName">
+            ~ I Think They Call This Love ~
+          </p>
+          <div class="hearts-row">
+            <span style="animation: pulse 1.5s infinite">💗</span>
+            <span style="animation: pulse 1.5s 0.2s infinite">💕</span>
+            <span style="animation: pulse 1.5s 0.4s infinite">💖</span>
+            <span style="animation: pulse 1.5s 0.6s infinite">💓</span>
+            <span style="animation: pulse 1.5s 0.8s infinite">💝</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHOTOS -->
+      <div class="page" id="page-photos">
+        <div class="photos-page">
+          <div class="page-sub">moments captured</div>
+          <h2 class="page-heading">Us, Always 💝</h2>
+          <div class="slideshow-wrap">
+            <div id="slideshowInner"></div>
+            <div
+              class="slide-caption"
+              id="slideCaption"
+              style="display: none"
+            ></div>
+          </div>
+          <div class="slide-nav">
+            <div class="slide-dots" id="slideDots"></div>
+          </div>
+          <div class="photo-grid" id="photoGrid"></div>
+        </div>
+      </div>
+
+      <!-- MESSAGE -->
+      <div class="page" id="page-message">
+        <div class="message-page">
+          <div class="page-sub" style="margin-bottom: 6px">from my heart</div>
+          <h2 class="page-heading">My Heart Speaks 💌</h2>
+          <div class="message-card">
+            <div class="message-deco tl">"</div>
+            <div class="message-deco br">"</div>
+            <div class="message-text" id="messageText">Loading...</div>
+            <div class="gold-line"></div>
+            <div class="message-sig" id="messageSig">— Forever yours 💕</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEOS -->
+      <div class="page" id="page-videos">
+        <div class="videos-page">
+          <div class="page-sub">our moments</div>
+          <h2 class="page-heading">Memories Together 🎬</h2>
+          <div class="video-grid" id="videoGrid">
+            <div class="no-content">
+              <span class="emoji">🎬</span>Our videos will appear here
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="nav-home" onclick="goPage('home')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-btn" id="nav-photos" onclick="goPage('photos')">
+        <span class="nav-icon">📸</span>
+        <span class="nav-label">Photos</span>
+      </button>
+      <button class="nav-btn" id="nav-message" onclick="goPage('message')">
+        <span class="nav-icon">💌</span>
+        <span class="nav-label">Message</span>
+      </button>
+      <button class="nav-btn" id="nav-videos" onclick="goPage('videos')">
+        <span class="nav-icon">🎬</span>
+        <span class="nav-label">Videos</span>
+      </button>
+    </nav>
+
+    <!-- ADMIN TRIGGER -->
+    <button class="admin-trigger" id="adminTrigger" onclick="openAdmin()">
+      ⚙
+    </button>
+
+    <!-- ADMIN OVERLAY -->
+    <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
+
+    <!-- ADMIN PANEL -->
+    <div class="admin-panel" id="adminPanel">
+      <!-- LOGIN -->
+      <div
+        id="adminLogin"
+        style="display: flex; flex-direction: column; height: 100%"
+      >
+        <div class="admin-header">
+          <div class="admin-header-text">
+            <h2>Admin Panel 🔐</h2>
+            <p>Secret access — only you</p>
+          </div>
+          <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
+        </div>
+        <div class="admin-login-body">
+          <h3>Enter your password</h3>
+          <input
+            type="password"
+            class="admin-input"
+            id="adminPass"
+            placeholder="Password..."
+            onkeydown="if (event.key === 'Enter') adminLogin();"
+          />
+          <button class="admin-btn" onclick="adminLogin()">Unlock 💕</button>
+        </div>
+      </div>
+
+      <!-- LOGGED IN -->
+      <div
+        id="adminContent"
+        style="display: none; flex-direction: column; height: 100%"
+      >
+        <div class="admin-header">
+          <div class="admin-header-text">
+            <h2>Love Site Admin 💕</h2>
+            <p>Manage everything here</p>
+          </div>
+          <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
+        </div>
+
+        <!-- TABS -->
+        <div class="admin-tabs">
+          <button
+            class="admin-tab active"
+            id="atab-photos"
+            onclick="switchAdminTab('photos')"
+          >
+            <span class="tab-icon">📸</span>Photos
+          </button>
+          <button
+            class="admin-tab"
+            id="atab-song"
+            onclick="switchAdminTab('song')"
+          >
+            <span class="tab-icon">🎵</span>Song
+          </button>
+          <button
+            class="admin-tab"
+            id="atab-message"
+            onclick="switchAdminTab('message')"
+          >
+            <span class="tab-icon">💌</span>Message
+          </button>
+          <button
+            class="admin-tab"
+            id="atab-videos"
+            onclick="switchAdminTab('videos')"
+          >
+            <span class="tab-icon">🎬</span>Videos
+          </button>
+        </div>
+
+        <!-- TAB: PHOTOS -->
+        <div class="admin-tab-body" id="abody-photos">
+          <p class="admin-section-title">Add Photos to Slideshow</p>
+          <label class="label">Caption for new photos</label>
+          <input
+            type="text"
+            class="admin-input"
+            id="photoCaption"
+            placeholder="e.g. My favourite smile 💗"
+          />
+          <label class="admin-file-label">
+            📷 Choose Photos (multiple OK)
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              style="display: none"
+              onchange="uploadPhotos(event)"
+            />
+          </label>
+          <p class="admin-section-title" style="margin-top: 16px">
+            Current Photos
+          </p>
+          <div class="admin-list" id="adminPhotoList">
+            <div style="color: #ccc; font-size: 13px">No photos yet</div>
+          </div>
+        </div>
+
+        <!-- TAB: SONG -->
+        <div class="admin-tab-body" id="abody-song" style="display: none">
+          <p class="admin-section-title">Change Background Song</p>
+          <label class="label">YouTube Video ID</label>
+          <input
+            type="text"
+            class="admin-input"
+            id="songYtId"
+            placeholder="e.g. MxfbUPpwDlw"
+          />
+          <div
+            style="
+              font-size: 11px;
+              color: #aaa;
+              margin-bottom: 12px;
+              margin-top: -6px;
+            "
+          >
+            From youtube.com/watch?v=<b>MxfbUPpwDlw</b> — copy the part after v=
+          </div>
+          <label class="label">Song Title</label>
+          <input
+            type="text"
+            class="admin-input"
+            id="songTitleInput"
+            placeholder="e.g. I Think They Call This Love"
+          />
+          <label class="label">Artist Name</label>
+          <input
+            type="text"
+            class="admin-input"
+            id="songArtistInput"
+            placeholder="e.g. Elliot James Reay"
+          />
+          <button class="admin-btn" onclick="saveSong()">
+            💾 Save & Play Song
+          </button>
+          <p class="admin-section-title" style="margin-top: 16px">All Songs</p>
+          <div class="admin-list" id="adminSongList">
+            <div style="color: #ccc; font-size: 13px">Loading...</div>
+          </div>
+        </div>
+
+        <!-- TAB: MESSAGE -->
+        <div class="admin-tab-body" id="abody-message" style="display: none">
+          <p class="admin-section-title">Edit Your Love Message</p>
+          <label class="label">Message</label>
+          <textarea
+            class="admin-textarea"
+            id="msgContent"
+            placeholder="Write your love message here..."
+          ></textarea>
+          <label class="label">Signature</label>
+          <input
+            type="text"
+            class="admin-input"
+            id="msgSig"
+            placeholder="e.g. — Forever yours 💕"
+          />
+          <button class="admin-btn" onclick="saveMessage()">
+            💌 Save Message
+          </button>
+        </div>
+
+        <!-- TAB: VIDEOS -->
+        <div class="admin-tab-body" id="abody-videos" style="display: none">
+          <p class="admin-section-title">Upload a Moment Video</p>
+          <label class="label">Video Title</label>
+          <input
+            type="text"
+            class="admin-input"
+            id="videoTitle"
+            placeholder="e.g. Our first date 💕"
+          />
+          <label class="admin-file-label">
+            🎬 Choose Video
+            <input
+              type="file"
+              accept="video/*"
+              style="display: none"
+              onchange="uploadVideo(event)"
+            />
+          </label>
+          <p class="admin-section-title" style="margin-top: 16px">
+            Current Videos
+          </p>
+          <div class="admin-list" id="adminVideoList">
+            <div style="color: #ccc; font-size: 13px">No videos yet</div>
+          </div>
+        </div>
+
+        <div style="padding: 0 20px 20px; flex-shrink: 0; background: white">
+          <button class="admin-btn secondary" onclick="adminLogout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API = "";
+      let currentPage = "home";
+      let slides = [],
+        currentSlide = 0,
+        slideshowTimer = null;
+      let currentYtId = "";
+      let ytPlayer,
+        ytReady = false,
+        wantPlay = true,
+        playing = false,
+        progTimer = null;
+      let currentAdminTab = "photos";
+
+      // ===== NAVIGATION =====
+      function goPage(name) {
+        if (name === currentPage) return;
+        const prev = document.getElementById("page-" + currentPage);
+        const next = document.getElementById("page-" + name);
+        prev.classList.add("exit-left");
+        setTimeout(() => {
+          prev.classList.remove("active", "exit-left");
+        }, 320);
+        next.classList.add("active");
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("nav-" + name).classList.add("active");
+        currentPage = name;
+      }
+
+      // ===== FALLING HEARTS =====
+      const canvas = document.getElementById("fallingCanvas");
+      const ctx = canvas.getContext("2d");
+      function resize() {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+      }
+      resize();
+      addEventListener("resize", resize);
+      const syms = [
+        "💕",
+        "💗",
+        "💖",
+        "💓",
+        "💝",
+        "🌸",
+        "✨",
+        "🌷",
+        "🫶",
+        "💐",
+        "🦋",
+        "🎀",
+      ];
+      const parts = [];
+      function mkP() {
+        return {
+          x: Math.random() * canvas.width,
+          y: -50,
+          s: syms[Math.floor(Math.random() * syms.length)],
+          sz: 12 + Math.random() * 20,
+          vy: 0.7 + Math.random() * 1.8,
+          vx: (Math.random() - 0.5) * 0.7,
+          rot: Math.random() * 360,
+          rv: (Math.random() - 0.5) * 2,
+          a: 0.4 + Math.random() * 0.4,
+          w: Math.random() * Math.PI * 2,
+          wv: 0.02 + Math.random() * 0.03,
+        };
+      }
+      for (let i = 0; i < 30; i++) {
+        const p = mkP();
+        p.y = Math.random() * innerHeight;
+        parts.push(p);
+      }
+      (function frame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (Math.random() < 0.07) parts.push(mkP());
+        if (parts.length > 70) parts.splice(0, 6);
+        parts.forEach((p) => {
+          p.y += p.vy;
+          p.w += p.wv;
+          p.x += p.vx + Math.sin(p.w) * 0.5;
+          p.rot += p.rv;
+          ctx.save();
+          ctx.globalAlpha = p.a;
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.font = p.sz + "px serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(p.s, 0, 0);
+          ctx.restore();
+          if (p.y > canvas.height + 60) {
+            p.y = -50;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== YOUTUBE =====
+      window.onYouTubeIframeAPIReady = function () {
+        if (currentYtId) initYT(currentYtId);
+      };
+      function initYT(id) {
+        if (ytPlayer) {
+          try {
+            ytPlayer.destroy();
+          } catch (e) {}
+          ytReady = false;
+        }
+        ytPlayer = new YT.Player("yt-player", {
+          height: "1",
+          width: "1",
+          videoId: id,
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+          },
+          events: {
+            onReady: (e) => {
+              ytReady = true;
+              document.getElementById("durTime").textContent = fmt(
+                e.target.getDuration(),
+              );
+              if (wantPlay) e.target.playVideo();
+            },
+            onStateChange: (e) => {
+              if (e.data === YT.PlayerState.PLAYING) {
+                playing = true;
+                document.getElementById("playBtn").textContent = "⏸";
+                startProg();
+              } else if (
+                e.data === YT.PlayerState.PAUSED ||
+                e.data === YT.PlayerState.ENDED
+              ) {
+                playing = false;
+                document.getElementById("playBtn").textContent = "▶";
+                stopProg();
+                if (e.data === YT.PlayerState.ENDED) ytPlayer.seekTo(0);
+              }
+            },
+          },
+        });
+      }
+      function fmt(s) {
+        s = Math.floor(s || 0);
+        return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+      }
+      function startProg() {
+        stopProg();
+        progTimer = setInterval(() => {
+          if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+          const c = ytPlayer.getCurrentTime(),
+            d = ytPlayer.getDuration();
+          if (d)
+            document.getElementById("progressFill").style.width =
+              (c / d) * 100 + "%";
+          document.getElementById("curTime").textContent = fmt(c);
+          document.getElementById("durTime").textContent = fmt(d);
+        }, 500);
+      }
+      function stopProg() {
+        if (progTimer) {
+          clearInterval(progTimer);
+          progTimer = null;
+        }
+      }
+      function togglePlay() {
+        if (!ytReady) {
+          wantPlay = true;
+          return;
+        }
+        if (playing) ytPlayer.pauseVideo();
+        else ytPlayer.playVideo();
+      }
+      function seekTo(e) {
+        if (!ytReady || !ytPlayer.getDuration) return;
+        const r = document
+          .getElementById("progressBar")
+          .getBoundingClientRect();
+        ytPlayer.seekTo(
+          ((e.clientX - r.left) / r.width) * ytPlayer.getDuration(),
+          true,
+        );
+      }
+      document.addEventListener(
+        "click",
+        () => {
+          if (ytReady && !playing) ytPlayer.playVideo();
+        },
+        { once: true },
+      );
+
+      // ===== SLIDESHOW =====
+      function buildSlideshow(photos) {
+        const inner = document.getElementById("slideshowInner");
+        const dots = document.getElementById("slideDots");
+        const grid = document.getElementById("photoGrid");
+        inner.innerHTML = "";
+        dots.innerHTML = "";
+        grid.innerHTML = "";
+        slides = photos;
+        if (!photos.length) {
+          inner.innerHTML =
+            '<div class="slide active"><div class="slide-placeholder"><span class="emoji">📸</span>Photos coming soon 💕</div></div>';
+          document.getElementById("slideCaption").style.display = "none";
+          return;
+        }
+        photos.forEach((p, i) => {
+          // Slide
+          const div = document.createElement("div");
+          div.className = "slide" + (i === 0 ? " active" : "");
+          div.innerHTML = `<img src="${p.url}" alt="${p.caption || ""}" loading="lazy">`;
+          inner.appendChild(div);
+          // Dot
+          const dot = document.createElement("div");
+          dot.className = "dot" + (i === 0 ? " active" : "");
+          dot.onclick = () => goSlide(i);
+          dots.appendChild(dot);
+          // Grid thumb
+          const th = document.createElement("div");
+          th.className = "photo-thumb-item";
+          th.innerHTML = `<img src="${p.url}" loading="lazy">`;
+          th.onclick = () => goSlide(i);
+          grid.appendChild(th);
+        });
+        updateCaption();
+        if (slideshowTimer) clearInterval(slideshowTimer);
+        slideshowTimer = setInterval(nextSlide, 4500);
+      }
+      function goSlide(n) {
+        document
+          .querySelectorAll(".slide")
+          .forEach((s, i) => s.classList.toggle("active", i === n));
+        document
+          .querySelectorAll(".dot")
+          .forEach((d, i) => d.classList.toggle("active", i === n));
+        document
+          .querySelectorAll(".photo-thumb-item")
+          .forEach((t, i) => t.classList.toggle("sel", i === n));
+        currentSlide = n;
+        updateCaption();
+      }
+      function nextSlide() {
+        if (slides.length) goSlide((currentSlide + 1) % slides.length);
+      }
+      function prevSlide() {
+        if (slides.length)
+          goSlide((currentSlide - 1 + slides.length) % slides.length);
+      }
+      function updateCaption() {
+        const cap = document.getElementById("slideCaption");
+        if (slides[currentSlide]?.caption) {
+          cap.textContent = slides[currentSlide].caption;
+          cap.style.display = "block";
+        } else cap.style.display = "none";
+      }
+
+      // ===== VIDEOS =====
+      function buildVideos(videos) {
+        const grid = document.getElementById("videoGrid");
+        if (!videos.length) {
+          grid.innerHTML =
+            '<div class="no-content"><span class="emoji">🎬</span>Our moments will appear here</div>';
+          return;
+        }
+        grid.innerHTML = "";
+        videos.forEach((v) => {
+          const card = document.createElement("div");
+          card.className = "video-card";
+          card.innerHTML = `
+      <div class="video-thumb" onclick="openModal('${v.url}')">
+        <video src="${v.url}" muted playsinline preload="metadata"></video>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${v.title}</div>
+        <div class="comments-area">
+          <div class="comment-list" id="clist-${v._id}"></div>
+          <div class="comment-form">
+            <input class="comment-input" id="cinput-${v._id}" placeholder="Leave a comment 💕" onkeydown="if(event.key==='Enter')postComment('${v._id}')">
+            <button class="comment-btn" onclick="postComment('${v._id}')">💕</button>
+          </div>
+        </div>
+      </div>`;
+          grid.appendChild(card);
+          loadComments(v._id);
+        });
+      }
+      async function loadComments(vid) {
+        try {
+          const res = await fetch(`${API}/api/videos/${vid}/comments`);
+          const comments = await res.json();
+          const list = document.getElementById(`clist-${vid}`);
+          if (!list) return;
+          list.innerHTML = comments.length
+            ? comments
+                .map(
+                  (c) =>
+                    `<div class="comment-item"><span class="comment-author">${c.author}</span>${c.text}</div>`,
+                )
+                .join("")
+            : '<div style="font-size:12px;color:#e8437a;opacity:0.45;padding:4px 0">Be the first to comment 💕</div>';
+          list.scrollTop = list.scrollHeight;
+        } catch (e) {}
+      }
+      async function postComment(vid) {
+        const input = document.getElementById(`cinput-${vid}`);
+        if (!input.value.trim()) return;
+        await fetch(`${API}/api/videos/${vid}/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: input.value, author: "My Love 💕" }),
+        });
+        input.value = "";
+        loadComments(vid);
+      }
+      function openModal(url) {
+        const v = document.getElementById("modalVideo");
+        v.src = url;
+        v.play();
+        document.getElementById("videoModal").classList.add("open");
+      }
+      function closeModal(e) {
+        if (e.target === document.getElementById("videoModal")) {
+          document.getElementById("modalVideo").pause();
+          document.getElementById("videoModal").classList.remove("open");
+        }
+      }
+
+      // ===== LOAD DATA =====
+      async function loadPublicData() {
+        try {
+          const res = await fetch(`${API}/api/public`);
+          const data = await res.json();
+          if (data.song) {
+            document.getElementById("songTitle").textContent = data.song.title;
+            document.getElementById("songArtist").textContent =
+              data.song.artist + " ♪";
+            document.getElementById("heroSongName").textContent =
+              "~ " + data.song.title + " ~";
+            if (currentYtId !== data.song.youtubeId) {
+              currentYtId = data.song.youtubeId;
+              if (typeof YT !== "undefined" && YT.Player) initYT(currentYtId);
+            }
+          }
+          if (data.message) {
+            document.getElementById("messageText").textContent =
+              data.message.content;
+            document.getElementById("messageSig").textContent =
+              data.message.signature;
+          }
+          buildSlideshow(data.photos || []);
+          buildVideos(data.videos || []);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      loadPublicData();
+
+      // ===== TOAST =====
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2600);
+      }
+
+      // ===== ADMIN =====
+      function openAdmin() {
+        document.getElementById("adminOverlay").classList.add("open");
+        document.getElementById("adminPanel").classList.add("open");
+      }
+      function closeAdmin() {
+        document.getElementById("adminOverlay").classList.remove("open");
+        document.getElementById("adminPanel").classList.remove("open");
+      }
+
+      function switchAdminTab(tab) {
+        currentAdminTab = tab;
+        document
+          .querySelectorAll(".admin-tab")
+          .forEach((t) => t.classList.toggle("active", t.id === "atab-" + tab));
+        document
+          .querySelectorAll(".admin-tab-body")
+          .forEach(
+            (b) =>
+              (b.style.display = b.id === "abody-" + tab ? "block" : "none"),
+          );
+      }
+
+      async function adminLogin() {
+        const pass = document.getElementById("adminPass").value;
+        const res = await fetch(`${API}/api/admin/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pass }),
+        });
+        if (res.ok) {
+          document.getElementById("adminLogin").style.display = "none";
+          document.getElementById("adminContent").style.display = "flex";
+          loadAdminData();
+          showToast("Welcome back 💕");
+        } else {
+          showToast("Wrong password 🔐");
+        }
+      }
+      async function adminLogout() {
+        await fetch(`${API}/api/admin/logout`, { method: "POST" });
+        document.getElementById("adminLogin").style.display = "flex";
+        document.getElementById("adminContent").style.display = "none";
+        document.getElementById("adminPass").value = "";
+        closeAdmin();
+      }
+
+      async function loadAdminData() {
+        const res = await fetch(`${API}/api/public`);
+        const data = await res.json();
+        if (data.message) {
+          document.getElementById("msgContent").value = data.message.content;
+          document.getElementById("msgSig").value = data.message.signature;
+        }
+        if (data.song) {
+          document.getElementById("songYtId").value = data.song.youtubeId;
+          document.getElementById("songTitleInput").value = data.song.title;
+          document.getElementById("songArtistInput").value = data.song.artist;
+        }
+
+        // Photos list
+        const pl = document.getElementById("adminPhotoList");
+        pl.innerHTML =
+          data.photos && data.photos.length
+            ? data.photos
+                .map(
+                  (p) => `
+    <div class="admin-list-item">
+      <img class="admin-list-thumb" src="${p.url}">
+      <div class="admin-list-info"><div class="admin-list-title">${p.caption || "No caption"}</div></div>
+      <button class="admin-del-btn" onclick="deletePhoto('${p._id}')">🗑</button>
+    </div>`,
+                )
+                .join("")
+            : '<div style="color:#ccc;font-size:13px">No photos yet</div>';
+
+        // Songs list (all songs)
+        const sl = document.getElementById("adminSongList");
+        const allSongs = await fetch(`${API}/api/admin/songs`)
+          .then((r) => r.json())
+          .catch(() => []);
+        sl.innerHTML = allSongs.length
+          ? allSongs
+              .map(
+                (s) => `
+    <div class="admin-list-item">
+      <div style="font-size:28px;flex-shrink:0">🎵</div>
+      <div class="admin-list-info">
+        <div class="admin-list-title">${s.title}${s.active ? '<span class="badge">Playing</span>' : ""}</div>
+        <div class="admin-list-sub">${s.artist} · ${s.youtubeId}</div>
+      </div>
+      <button class="admin-del-btn" onclick="deleteSong('${s._id}')">🗑</button>
+    </div>`,
+              )
+              .join("")
+          : '<div style="color:#ccc;font-size:13px">No songs added yet</div>';
+
+        // Videos list
+        const vl = document.getElementById("adminVideoList");
+        vl.innerHTML =
+          data.videos && data.videos.length
+            ? data.videos
+                .map(
+                  (v) => `
+    <div class="admin-list-item">
+      <video class="admin-list-thumb" src="${v.url}" muted></video>
+      <div class="admin-list-info"><div class="admin-list-title">${v.title}</div></div>
+      <button class="admin-del-btn" onclick="deleteVideo('${v._id}')">🗑</button>
+    </div>`,
+                )
+                .join("")
+            : '<div style="color:#ccc;font-size:13px">No videos yet</div>';
+      }
+
+      async function uploadPhotos(event) {
+        const caption = document.getElementById("photoCaption").value || "💕";
+        const files = Array.from(event.target.files);
+        showToast("Uploading photos...");
+        for (const file of files) {
+          const fd = new FormData();
+          fd.append("photo", file);
+          fd.append("caption", caption);
+          await fetch(`${API}/api/admin/photos`, { method: "POST", body: fd });
+        }
+        showToast("Photos added 💕");
+        event.target.value = "";
+        await loadPublicData();
+        loadAdminData();
+      }
+
+      async function uploadVideo(event) {
+        const title =
+          document.getElementById("videoTitle").value || "Our Moment 💕";
+        const file = event.target.files[0];
+        if (!file) return;
+        showToast("Uploading video... 🎬");
+        const fd = new FormData();
+        fd.append("video", file);
+        fd.append("title", title);
+        await fetch(`${API}/api/admin/videos`, { method: "POST", body: fd });
+        showToast("Video added 💕");
+        event.target.value = "";
+        await loadPublicData();
+        loadAdminData();
+      }
+
+      async function saveSong() {
+        const ytId = document.getElementById("songYtId").value.trim();
+        const title = document.getElementById("songTitleInput").value.trim();
+        const artist = document.getElementById("songArtistInput").value.trim();
+        if (!ytId || !title) return showToast("Fill in the song details");
+        await fetch(`${API}/api/admin/song`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ youtubeId: ytId, title, artist }),
+        });
+        showToast("Song saved & playing 🎵");
+        document.getElementById("songYtId").value = "";
+        document.getElementById("songTitleInput").value = "";
+        document.getElementById("songArtistInput").value = "";
+        await loadPublicData();
+        loadAdminData();
+      }
+
+      async function saveMessage() {
+        const content = document.getElementById("msgContent").value.trim();
+        const signature = document.getElementById("msgSig").value.trim();
+        if (!content) return showToast("Write a message first 💌");
+        await fetch(`${API}/api/admin/message`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content, signature }),
+        });
+        showToast("Message saved 💌");
+        await loadPublicData();
+      }
+
+      async function deletePhoto(id) {
+        if (!confirm("Delete this photo?")) return;
+        await fetch(`${API}/api/admin/photos/${id}`, { method: "DELETE" });
+        showToast("Photo removed");
+        await loadPublicData();
+        loadAdminData();
+      }
+      async function deleteVideo(id) {
+        if (!confirm("Delete this video?")) return;
+        await fetch(`${API}/api/admin/videos/${id}`, { method: "DELETE" });
+        showToast("Video removed");
+        await loadPublicData();
+        loadAdminData();
+      }
+      async function deleteSong(id) {
+        if (!confirm("Delete this song?")) return;
+        await fetch(`${API}/api/admin/songs/${id}`, { method: "DELETE" });
+        showToast("Song removed");
+        await loadPublicData();
+        loadAdminData();
+      }
+    </script>
+  </body>
+</html>
