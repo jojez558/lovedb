@@ -12,6 +12,8 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const cors = require("cors");
 const session = require("express-session");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const { Photo, Video, Comment, Song, Message, Recording } = require("./models");
 
@@ -21,18 +23,55 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "iloveher2024";
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/loveapp";
 console.log("🔧 MONGO_URI loaded:", MONGO_URI);
 
-// Storage for uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = "./public/uploads";
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname.replace(/\s/g, "_"));
+// ===== CLOUDINARY (persistent storage — survives redeploys/restarts) =====
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Photos & general images
+const photoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "love-app/photos",
+    resource_type: "image",
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "gif"],
   },
 });
-const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
+
+// Videos
+const videoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "love-app/videos",
+    resource_type: "video",
+    allowed_formats: ["mp4", "mov", "webm", "avi", "mkv"],
+  },
+});
+
+// Voice recordings (audio)
+const recordingStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "love-app/recordings",
+    resource_type: "video", // Cloudinary treats audio under the "video" resource type
+    allowed_formats: ["webm", "mp3", "wav", "m4a", "ogg"],
+  },
+});
+
+const uploadPhoto = multer({
+  storage: photoStorage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
+const uploadVideo = multer({
+  storage: videoStorage,
+  limits: { fileSize: 100 * 1024 * 1024 },
+});
+const uploadRecording = multer({
+  storage: recordingStorage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
 
 app.use(cors());
 app.use(express.json());
@@ -45,7 +84,6 @@ app.use(
   }),
 );
 app.use(express.static("public"));
-app.use("/uploads", express.static("public/uploads"));
 
 // Connect MongoDB
 mongoose
@@ -141,11 +179,11 @@ app.get("/api/admin/check", (req, res) => {
 app.post(
   "/api/admin/photos",
   requireAdmin,
-  upload.single("photo"),
+  uploadPhoto.single("photo"),
   async (req, res) => {
     try {
       const photo = await Photo.create({
-        url: "/uploads/" + req.file.filename,
+        url: req.file.path, // Cloudinary secure URL
         caption: req.body.caption || "💕",
         order: req.body.order || 0,
       });
@@ -159,9 +197,16 @@ app.post(
 app.delete("/api/admin/photos/:id", requireAdmin, async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
-    if (photo) {
-      const fp = "./public" + photo.url;
-      if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    if (photo && photo.url) {
+      try {
+        const publicId = extractCloudinaryPublicId(photo.url);
+        if (publicId)
+          await cloudinary.uploader.destroy(publicId, {
+            resource_type: "image",
+          });
+      } catch (cloudErr) {
+        console.warn("Cloudinary delete failed (non-fatal):", cloudErr.message);
+      }
     }
     res.json({ success: true });
   } catch (e) {
@@ -173,11 +218,11 @@ app.delete("/api/admin/photos/:id", requireAdmin, async (req, res) => {
 app.post(
   "/api/admin/videos",
   requireAdmin,
-  upload.single("video"),
+  uploadVideo.single("video"),
   async (req, res) => {
     try {
       const video = await Video.create({
-        url: "/uploads/" + req.file.filename,
+        url: req.file.path, // Cloudinary secure URL
         title: req.body.title || "Our Moment 💕",
         thumbnail: req.body.thumbnail || "",
       });
@@ -191,9 +236,16 @@ app.post(
 app.delete("/api/admin/videos/:id", requireAdmin, async (req, res) => {
   try {
     const video = await Video.findByIdAndDelete(req.params.id);
-    if (video) {
-      const fp = "./public" + video.url;
-      if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    if (video && video.url) {
+      try {
+        const publicId = extractCloudinaryPublicId(video.url);
+        if (publicId)
+          await cloudinary.uploader.destroy(publicId, {
+            resource_type: "video",
+          });
+      } catch (cloudErr) {
+        console.warn("Cloudinary delete failed (non-fatal):", cloudErr.message);
+      }
     }
     await Comment.deleteMany({ videoId: req.params.id });
     res.json({ success: true });
@@ -259,9 +311,6 @@ app.put("/api/admin/message", requireAdmin, async (req, res) => {
 });
 
 // ===== RECORDINGS (her voice notes) =====
-// NOTE: not gated behind requireAdmin — she records on the public site and
-// sends straight to you, same as how comments work. The /uploads route
-// already serves these publicly, and they appear in /api/public above.
 // Lightweight key check — not the admin session, just a shared key so the
 // public recording form can't be spammed by random bots. Not meant to be
 // strong security, just a basic gate.
@@ -273,12 +322,12 @@ const requireRecordingKey = (req, res, next) => {
 
 app.post(
   "/api/admin/recordings",
-  upload.single("recording"),
+  uploadRecording.single("recording"),
   requireRecordingKey,
   async (req, res) => {
     try {
       const recording = await Recording.create({
-        url: "/uploads/" + req.file.filename,
+        url: req.file.path, // Cloudinary secure URL
         duration: req.body.duration || 0,
       });
       res.json(recording);
@@ -297,15 +346,37 @@ app.delete("/api/admin/recordings/:id", async (req, res) => {
   }
   try {
     const recording = await Recording.findByIdAndDelete(req.params.id);
-    if (recording) {
-      const fp = "./public" + recording.url;
-      if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    if (recording && recording.url) {
+      try {
+        const publicId = extractCloudinaryPublicId(recording.url);
+        if (publicId)
+          await cloudinary.uploader.destroy(publicId, {
+            resource_type: "video",
+          });
+      } catch (cloudErr) {
+        console.warn("Cloudinary delete failed (non-fatal):", cloudErr.message);
+      }
     }
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
+
+// Helper: pull the Cloudinary public_id (including folder) out of a secure_url
+// so we can delete the asset later. Cloudinary URLs look like:
+// https://res.cloudinary.com/<cloud>/image/upload/v123456/love-app/photos/abc123.jpg
+function extractCloudinaryPublicId(url) {
+  try {
+    const afterUpload = url.split("/upload/")[1]; // "v123456/love-app/photos/abc123.jpg"
+    if (!afterUpload) return null;
+    const withoutVersion = afterUpload.replace(/^v\d+\//, ""); // "love-app/photos/abc123.jpg"
+    const withoutExt = withoutVersion.replace(/\.[a-zA-Z0-9]+$/, ""); // "love-app/photos/abc123"
+    return withoutExt;
+  } catch (e) {
+    return null;
+  }
+}
 
 // Serve the main app
 app.get("*", (req, res) => {
