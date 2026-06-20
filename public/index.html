@@ -714,6 +714,24 @@
         align-items: center;
         gap: 12px;
       }
+      .recording-del-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.25);
+        border: none;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+      .recording-del-btn:active {
+        background: rgba(255, 68, 68, 0.5);
+      }
       .recording-icon {
         width: 40px;
         height: 40px;
@@ -1723,6 +1741,17 @@
 
       // ===== SLIDESHOW =====
       function buildSlideshow(photos) {
+        // Skip rebuilding if the photo set hasn't actually changed — avoids
+        // resetting the slideshow position/timer every time loadPublicData()
+        // runs (e.g. after adding a video, recording, etc).
+        const photoIds = photos.map((p) => p._id || p.url).join(",");
+        if (
+          photoIds === window.__lastPhotoIds &&
+          slides.length === photos.length
+        )
+          return;
+        window.__lastPhotoIds = photoIds;
+
         const inner = document.getElementById("slideshowInner"),
           dots = document.getElementById("slideDots"),
           grid = document.getElementById("photoGrid");
@@ -1730,10 +1759,15 @@
         dots.innerHTML = "";
         grid.innerHTML = "";
         slides = photos;
+        currentSlide = 0;
         if (!photos.length) {
           inner.innerHTML =
             '<div class="slide active"><div class="slide-placeholder"><span class="emoji">📸</span>Photos coming soon 💕</div></div>';
           document.getElementById("slideCaption").style.display = "none";
+          if (slideshowTimer) {
+            clearInterval(slideshowTimer);
+            slideshowTimer = null;
+          }
           return;
         }
         photos.forEach((p, i) => {
@@ -1846,10 +1880,13 @@
       }
 
       // ===== LOAD DATA =====
+      let loadRetryCount = 0;
       async function loadPublicData() {
         try {
           const res = await fetch(`${API}/api/public`);
+          if (!res.ok) throw new Error("Server responded " + res.status);
           const data = await res.json();
+          loadRetryCount = 0;
 
           // Build playlist from all saved songs; start at the active one (or first)
           if (data.songs && data.songs.length) {
@@ -1881,6 +1918,23 @@
                 }
               }
             }
+          } else if (data.song) {
+            // Fallback: older API shape with only a single active song, no songs[] array
+            songPlaylist = [data.song];
+            songIndex = 0;
+            updateSongDisplay(data.song);
+            if (currentYtId !== data.song.youtubeId || !ytReady) {
+              currentYtId = data.song.youtubeId;
+              if (ytApiReady && typeof YT !== "undefined" && YT.Player) {
+                initYT(currentYtId);
+              } else {
+                pendingSongData = data.song;
+              }
+            }
+          } else {
+            document.getElementById("songTitle").textContent =
+              "No song added yet";
+            document.getElementById("songArtist").textContent = "♪";
           }
 
           if (data.message) {
@@ -1894,6 +1948,16 @@
           buildRecordings(data.recordings || []);
         } catch (e) {
           console.error(e);
+          // Don't leave the UI stuck on "Loading..." forever — retry a few
+          // times in case the server was briefly waking up (e.g. Render
+          // free-tier cold start), then show a clear message.
+          loadRetryCount++;
+          if (loadRetryCount <= 5) {
+            setTimeout(loadPublicData, 2000);
+          } else {
+            document.getElementById("songTitle").textContent =
+              "Couldn't load song";
+          }
         }
       }
       loadPublicData();
@@ -2019,9 +2083,30 @@
               <div class="recording-date">${date}</div>
               <audio controls src="${r.url}"></audio>
             </div>
+            <button class="recording-del-btn" onclick="deleteRecordingPrompt('${r._id}')" title="Delete">🗑</button>
           </div>`;
           })
           .join("");
+      }
+
+      async function deleteRecordingPrompt(id) {
+        const pass = prompt("Enter admin password to delete this recording:");
+        if (pass === null) return;
+        try {
+          const res = await fetch(`${API}/api/admin/recordings/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: pass }),
+          });
+          if (res.ok) {
+            showToast("Recording deleted");
+            await loadPublicData();
+          } else {
+            showToast("Wrong password 🔐");
+          }
+        } catch (e) {
+          showToast("Couldn't delete — try again");
+        }
       }
 
       function showToast(msg) {

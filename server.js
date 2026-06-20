@@ -81,14 +81,16 @@ const requireAdmin = (req, res, next) => {
 // ===== PUBLIC API =====
 app.get("/api/public", async (req, res) => {
   try {
-    const [photos, videos, song, message, recordings] = await Promise.all([
-      Photo.find().sort({ order: 1, createdAt: 1 }),
-      Video.find().sort({ createdAt: -1 }),
-      Song.findOne({ active: true }),
-      Message.findOne(),
-      Recording.find().sort({ createdAt: -1 }),
-    ]);
-    res.json({ photos, videos, song, message, recordings });
+    const [photos, videos, song, songs, message, recordings] =
+      await Promise.all([
+        Photo.find().sort({ order: 1, createdAt: 1 }),
+        Video.find().sort({ createdAt: -1 }),
+        Song.findOne({ active: true }),
+        Song.find().sort({ createdAt: 1 }),
+        Message.findOne(),
+        Recording.find().sort({ createdAt: -1 }),
+      ]);
+    res.json({ photos, videos, song, songs, message, recordings });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -286,7 +288,13 @@ app.post(
   },
 );
 
-app.delete("/api/admin/recordings/:id", requireAdmin, async (req, res) => {
+app.delete("/api/admin/recordings/:id", async (req, res) => {
+  // Public route — she taps delete on her phone with no admin session, so
+  // we check the password directly in the request body instead of relying
+  // on req.session.isAdmin.
+  if (req.body.password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Wrong password" });
+  }
   try {
     const recording = await Recording.findByIdAndDelete(req.params.id);
     if (recording) {
