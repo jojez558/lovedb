@@ -192,7 +192,7 @@
       }
 
       .home-page {
-        background: rgba(255, 159, 196, 0.65);
+        background: rgba(255, 159, 196, 0.78);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -216,7 +216,9 @@
         line-height: 1;
         font-style: italic;
         animation: floatTitle 4s ease-in-out infinite;
-        text-shadow: 0 4px 20px rgba(194, 24, 91, 0.5);
+        text-shadow:
+          0 4px 20px rgba(194, 24, 91, 0.7),
+          0 2px 4px rgba(194, 24, 91, 0.9);
       }
       @keyframes floatTitle {
         0%,
@@ -258,7 +260,7 @@
 
       .photos-page {
         padding: 28px 20px 24px;
-        background: rgba(255, 159, 196, 0.65);
+        background: rgba(255, 159, 196, 0.78);
         min-height: 100%;
         position: relative;
         overflow: hidden;
@@ -402,7 +404,7 @@
 
       .message-page {
         padding: 28px 20px 24px;
-        background: rgba(255, 159, 196, 0.65);
+        background: rgba(255, 159, 196, 0.78);
         min-height: 100%;
       }
       .message-card {
@@ -437,7 +439,9 @@
         line-height: 2;
         font-style: italic;
         white-space: pre-line;
-        text-shadow: 0 2px 10px rgba(194, 24, 91, 0.5);
+        text-shadow:
+          0 2px 10px rgba(194, 24, 91, 0.7),
+          0 1px 3px rgba(194, 24, 91, 0.95);
       }
       .gold-line {
         width: 50px;
@@ -457,7 +461,7 @@
 
       .videos-page {
         padding: 28px 20px 24px;
-        background: rgba(255, 159, 196, 0.65);
+        background: rgba(255, 159, 196, 0.78);
         min-height: 100%;
       }
       .video-grid {
@@ -575,7 +579,7 @@
       /* ===== RECORD PAGE ===== */
       .record-page {
         padding: 28px 20px 24px;
-        background: rgba(255, 159, 196, 0.65);
+        background: rgba(255, 159, 196, 0.78);
         min-height: 100%;
       }
       .record-hint {
@@ -1594,8 +1598,16 @@
       })();
 
       // ===== YOUTUBE (plays full playlist of all saved songs) =====
+      let ytApiReady = false;
+      let pendingSongData = null;
       window.onYouTubeIframeAPIReady = function () {
-        if (currentYtId) initYT(currentYtId);
+        ytApiReady = true;
+        if (pendingSongData) {
+          initYT(pendingSongData.youtubeId);
+          pendingSongData = null;
+        } else if (currentYtId) {
+          initYT(currentYtId);
+        }
       };
       function initYT(id) {
         if (ytPlayer) {
@@ -1696,13 +1708,18 @@
           true,
         );
       }
-      document.addEventListener(
-        "click",
-        () => {
-          if (ytReady && !playing) ytPlayer.playVideo();
-        },
-        { once: true },
-      );
+      // Browsers block autoplay-with-sound until a user gesture. This ensures
+      // the very first tap/click anywhere on the page starts the song, even
+      // if the YouTube player wasn't ready yet at that exact moment.
+      let userInteracted = false;
+      function tryStartOnInteraction() {
+        userInteracted = true;
+        if (ytReady && ytPlayer && !playing) ytPlayer.playVideo();
+      }
+      document.addEventListener("click", tryStartOnInteraction, { once: true });
+      document.addEventListener("touchstart", tryStartOnInteraction, {
+        once: true,
+      });
 
       // ===== SLIDESHOW =====
       function buildSlideshow(photos) {
@@ -1855,9 +1872,13 @@
               songIndex = startIdx;
               const current = songPlaylist[songIndex];
               updateSongDisplay(current);
-              if (currentYtId !== current.youtubeId) {
+              if (currentYtId !== current.youtubeId || !ytReady) {
                 currentYtId = current.youtubeId;
-                if (typeof YT !== "undefined" && YT.Player) initYT(currentYtId);
+                if (ytApiReady && typeof YT !== "undefined" && YT.Player) {
+                  initYT(currentYtId);
+                } else {
+                  pendingSongData = current;
+                }
               }
             }
           }
