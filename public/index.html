@@ -300,11 +300,9 @@
 
       .slideshow-wrap {
         position: relative;
-        border-radius: 20px;
         overflow: hidden;
         aspect-ratio: 4/3;
-        background: linear-gradient(135deg, var(--rose-light), #ffaecf);
-        box-shadow: 0 16px 56px rgba(194, 24, 91, 0.22);
+        background: transparent;
         max-width: 600px;
         margin: 0 auto;
       }
@@ -327,9 +325,10 @@
       }
       .slide-placeholder {
         text-align: center;
-        color: var(--rose);
+        color: #fff;
         font-family: "Dancing Script", cursive;
         font-size: 24px;
+        text-shadow: 0 2px 8px rgba(194, 24, 91, 0.5);
       }
       .slide-placeholder .emoji {
         font-size: 64px;
@@ -407,22 +406,20 @@
         min-height: 100%;
       }
       .message-card {
-        background: white;
+        background: transparent;
         border-radius: 24px;
         padding: 40px 28px;
         max-width: 600px;
         margin: 0 auto;
-        box-shadow: 0 12px 48px rgba(194, 24, 91, 0.14);
-        border: 1.5px solid rgba(232, 67, 122, 0.12);
         position: relative;
       }
       .message-deco {
         position: absolute;
         font-size: 64px;
-        opacity: 0.05;
+        opacity: 0.1;
         font-family: serif;
         line-height: 1;
-        color: var(--rose-deep);
+        color: #fff;
       }
       .message-deco.tl {
         top: 12px;
@@ -436,23 +433,26 @@
       .message-text {
         font-family: "Playfair Display", serif;
         font-size: clamp(17px, 4vw, 22px);
-        color: var(--rose-deep);
+        color: #fff;
         line-height: 2;
         font-style: italic;
         white-space: pre-line;
+        text-shadow: 0 2px 10px rgba(194, 24, 91, 0.5);
       }
       .gold-line {
         width: 50px;
         height: 2px;
-        background: linear-gradient(90deg, var(--gold), var(--rose-light));
+        background: linear-gradient(90deg, var(--gold), #fff);
         margin: 20px 0;
         border-radius: 2px;
+        box-shadow: 0 1px 6px rgba(255, 255, 255, 0.5);
       }
       .message-sig {
         font-family: "Dancing Script", cursive;
         font-size: 26px;
-        color: var(--rose);
+        color: #fff;
         font-weight: 700;
+        text-shadow: 0 2px 8px rgba(194, 24, 91, 0.5);
       }
 
       .videos-page {
@@ -468,11 +468,9 @@
         margin: 0 auto;
       }
       .video-card {
-        background: white;
+        background: transparent;
         border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 6px 24px rgba(194, 24, 91, 0.1);
-        border: 1px solid rgba(232, 67, 122, 0.08);
+        overflow: visible;
       }
       .video-thumb {
         width: 100%;
@@ -508,11 +506,12 @@
       .video-title {
         font-family: "Dancing Script", cursive;
         font-size: 18px;
-        color: var(--rose-deep);
+        color: #fff;
         margin-bottom: 10px;
+        text-shadow: 0 2px 8px rgba(194, 24, 91, 0.5);
       }
       .comments-area {
-        border-top: 1px solid var(--rose-light);
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
         padding-top: 10px;
       }
       .comment-list {
@@ -522,12 +521,14 @@
       }
       .comment-item {
         padding: 5px 0;
-        border-bottom: 1px solid rgba(232, 67, 122, 0.07);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         font-size: 13px;
+        color: #fff;
+        text-shadow: 0 1px 4px rgba(194, 24, 91, 0.4);
       }
       .comment-author {
         font-weight: 600;
-        color: var(--rose);
+        color: #fff0f6;
         margin-right: 5px;
         font-size: 11px;
       }
@@ -539,9 +540,10 @@
         flex: 1;
         padding: 8px 12px;
         border-radius: 20px;
-        border: 1.5px solid var(--rose-light);
+        border: 1.5px solid rgba(255, 255, 255, 0.5);
         font-size: 13px;
         outline: none;
+        background: rgba(255, 255, 255, 0.9);
       }
       .comment-input:focus {
         border-color: var(--rose);
@@ -558,10 +560,11 @@
       .no-content {
         text-align: center;
         padding: 48px 20px;
-        color: var(--rose);
-        opacity: 0.5;
+        color: #fff;
+        opacity: 0.7;
         font-family: "Dancing Script", cursive;
         font-size: 22px;
+        text-shadow: 0 2px 6px rgba(194, 24, 91, 0.4);
       }
       .no-content .emoji {
         font-size: 48px;
@@ -585,12 +588,11 @@
         text-shadow: 0 2px 8px rgba(194, 24, 91, 0.4);
       }
       .record-card {
-        background: white;
+        background: transparent;
         border-radius: 24px;
         padding: 36px 24px;
         max-width: 480px;
         margin: 0 auto;
-        box-shadow: 0 12px 48px rgba(194, 24, 91, 0.18);
         text-align: center;
       }
       .record-visual {
@@ -651,10 +653,11 @@
       .record-timer {
         font-family: "Inter", sans-serif;
         font-size: 15px;
-        color: var(--rose-deep);
+        color: #fff;
         font-variant-numeric: tabular-nums;
         margin-bottom: 20px;
         font-weight: 500;
+        text-shadow: 0 2px 6px rgba(194, 24, 91, 0.4);
       }
       .record-controls {
         display: flex;
@@ -700,13 +703,12 @@
         margin: 0 auto;
       }
       .recording-item {
-        background: white;
+        background: transparent;
         border-radius: 16px;
-        padding: 14px 16px;
+        padding: 14px 0;
         display: flex;
         align-items: center;
         gap: 12px;
-        box-shadow: 0 4px 18px rgba(194, 24, 91, 0.1);
       }
       .recording-icon {
         width: 40px;
@@ -725,8 +727,10 @@
       }
       .recording-date {
         font-size: 11px;
-        color: #aaa;
+        color: #fff;
+        opacity: 0.85;
         margin-bottom: 4px;
+        text-shadow: 0 1px 4px rgba(194, 24, 91, 0.4);
       }
       .recording-item audio {
         width: 100%;
@@ -1474,6 +1478,8 @@
         currentSlide = 0,
         slideshowTimer = null;
       let currentYtId = "";
+      let songPlaylist = [];
+      let songIndex = 0;
       let ytPlayer,
         ytReady = false,
         wantPlay = true,
@@ -1587,7 +1593,7 @@
         requestAnimationFrame(frame);
       })();
 
-      // ===== YOUTUBE =====
+      // ===== YOUTUBE (plays full playlist of all saved songs) =====
       window.onYouTubeIframeAPIReady = function () {
         if (currentYtId) initYT(currentYtId);
       };
@@ -1621,18 +1627,35 @@
               if (e.data === YT.PlayerState.PLAYING) {
                 playing = true;
                 startProg();
-              } else if (
-                e.data === YT.PlayerState.PAUSED ||
-                e.data === YT.PlayerState.ENDED
-              ) {
+              } else if (e.data === YT.PlayerState.PAUSED) {
                 playing = false;
                 stopProg();
-                if (e.data === YT.PlayerState.ENDED && !videoModalOpen)
-                  ytPlayer.seekTo(0);
+              } else if (e.data === YT.PlayerState.ENDED) {
+                playing = false;
+                stopProg();
+                if (!videoModalOpen) playNextSong();
               }
             },
           },
         });
+      }
+      function playNextSong() {
+        if (!songPlaylist.length) return;
+        songIndex = (songIndex + 1) % songPlaylist.length;
+        const next = songPlaylist[songIndex];
+        currentYtId = next.youtubeId;
+        updateSongDisplay(next);
+        if (ytReady && ytPlayer && ytPlayer.loadVideoById) {
+          ytPlayer.loadVideoById(next.youtubeId);
+        } else {
+          initYT(currentYtId);
+        }
+      }
+      function updateSongDisplay(s) {
+        document.getElementById("songTitle").textContent = s.title;
+        document.getElementById("songArtist").textContent = s.artist + " ♪";
+        document.getElementById("heroSongName").textContent =
+          "~ " + s.title + " ~";
       }
       function fmt(s) {
         s = Math.floor(s || 0);
@@ -1810,17 +1833,35 @@
         try {
           const res = await fetch(`${API}/api/public`);
           const data = await res.json();
-          if (data.song) {
-            document.getElementById("songTitle").textContent = data.song.title;
-            document.getElementById("songArtist").textContent =
-              data.song.artist + " ♪";
-            document.getElementById("heroSongName").textContent =
-              "~ " + data.song.title + " ~";
-            if (currentYtId !== data.song.youtubeId) {
-              currentYtId = data.song.youtubeId;
-              if (typeof YT !== "undefined" && YT.Player) initYT(currentYtId);
+
+          // Build playlist from all saved songs; start at the active one (or first)
+          if (data.songs && data.songs.length) {
+            songPlaylist = data.songs;
+            let startIdx = 0;
+            if (data.song) {
+              const activeIdx = songPlaylist.findIndex(
+                (s) => s._id === data.song._id,
+              );
+              if (activeIdx !== -1) startIdx = activeIdx;
+            }
+            // Only (re)initialize the player if this is the first load or the
+            // playlist itself changed — avoids restarting the song on every
+            // periodic refresh while she's mid-listen.
+            const playlistChanged =
+              JSON.stringify(songPlaylist.map((s) => s._id)) !==
+              JSON.stringify(window.__lastPlaylistIds || []);
+            window.__lastPlaylistIds = songPlaylist.map((s) => s._id);
+            if (playlistChanged || !ytReady) {
+              songIndex = startIdx;
+              const current = songPlaylist[songIndex];
+              updateSongDisplay(current);
+              if (currentYtId !== current.youtubeId) {
+                currentYtId = current.youtubeId;
+                if (typeof YT !== "undefined" && YT.Player) initYT(currentYtId);
+              }
             }
           }
+
           if (data.message) {
             document.getElementById("messageText").textContent =
               data.message.content;
