@@ -13,7 +13,8 @@ const multer = require("multer");
 const cors = require("cors");
 const session = require("express-session");
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const _msc = require("multer-storage-cloudinary");
+const CloudinaryStorage = _msc.CloudinaryStorage || _msc;
 
 const { Photo, Video, Comment, Song, Message, Recording } = require("./models");
 
