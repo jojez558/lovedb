@@ -13,7 +13,7 @@ const multer = require("multer");
 const cors = require("cors");
 const session = require("express-session");
 
-const { Photo, Video, Comment, Song, Message } = require("./models");
+const { Photo, Video, Comment, Song, Message, Recording } = require("./models");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -81,13 +81,14 @@ const requireAdmin = (req, res, next) => {
 // ===== PUBLIC API =====
 app.get("/api/public", async (req, res) => {
   try {
-    const [photos, videos, song, message] = await Promise.all([
+    const [photos, videos, song, message, recordings] = await Promise.all([
       Photo.find().sort({ order: 1, createdAt: 1 }),
       Video.find().sort({ createdAt: -1 }),
       Song.findOne({ active: true }),
       Message.findOne(),
+      Recording.find().sort({ createdAt: -1 }),
     ]);
-    res.json({ photos, videos, song, message });
+    res.json({ photos, videos, song, message, recordings });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -250,6 +251,49 @@ app.put("/api/admin/message", requireAdmin, async (req, res) => {
       { upsert: true, new: true },
     );
     res.json(msg);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== RECORDINGS (her voice notes) =====
+// NOTE: not gated behind requireAdmin — she records on the public site and
+// sends straight to you, same as how comments work. The /uploads route
+// already serves these publicly, and they appear in /api/public above.
+// Lightweight key check — not the admin session, just a shared key so the
+// public recording form can't be spammed by random bots. Not meant to be
+// strong security, just a basic gate.
+const RECORDING_KEY = process.env.RECORDING_KEY || "our-love-2024";
+const requireRecordingKey = (req, res, next) => {
+  if (req.body.key === RECORDING_KEY) return next();
+  res.status(401).json({ error: "Unauthorized" });
+};
+
+app.post(
+  "/api/admin/recordings",
+  upload.single("recording"),
+  requireRecordingKey,
+  async (req, res) => {
+    try {
+      const recording = await Recording.create({
+        url: "/uploads/" + req.file.filename,
+        duration: req.body.duration || 0,
+      });
+      res.json(recording);
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  },
+);
+
+app.delete("/api/admin/recordings/:id", requireAdmin, async (req, res) => {
+  try {
+    const recording = await Recording.findByIdAndDelete(req.params.id);
+    if (recording) {
+      const fp = "./public" + recording.url;
+      if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    }
+    res.json({ success: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

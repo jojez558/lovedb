@@ -35,10 +35,9 @@
         overflow: hidden;
         font-family: "Inter", sans-serif;
         color: var(--text);
-        background: var(--blush);
+        background: #ff9fc4;
       }
 
-      /* ===== CANVAS ===== */
       #fallingCanvas {
         position: fixed;
         inset: 0;
@@ -46,7 +45,6 @@
         z-index: 1;
       }
 
-      /* ===== MUSIC BAR (top) ===== */
       .music-bar {
         position: fixed;
         top: 0;
@@ -62,25 +60,6 @@
         z-index: 300;
         border-bottom: 1px solid rgba(232, 67, 122, 0.15);
         box-shadow: 0 4px 20px rgba(194, 24, 91, 0.08);
-      }
-      .play-btn {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
-        border: none;
-        color: white;
-        font-size: 15px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 3px 12px rgba(232, 67, 122, 0.4);
-        flex-shrink: 0;
-        transition: transform 0.15s;
-      }
-      .play-btn:active {
-        transform: scale(0.93);
       }
       .song-info {
         flex: 1;
@@ -137,7 +116,6 @@
         height: 1px;
       }
 
-      /* ===== BOTTOM NAV ===== */
       .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -162,7 +140,6 @@
         background: none;
         cursor: pointer;
         transition: background 0.15s;
-        border-radius: 0;
         padding: 8px 4px;
       }
       .nav-btn:active {
@@ -181,11 +158,7 @@
       .nav-btn.active .nav-label {
         color: var(--rose);
       }
-      .nav-btn.active .nav-icon {
-        filter: saturate(1.5);
-      }
 
-      /* ===== PAGE SYSTEM ===== */
       .pages-wrap {
         position: fixed;
         top: var(--music-h);
@@ -193,7 +166,7 @@
         left: 0;
         right: 0;
         overflow: hidden;
-        z-index: 2;
+        z-index: 10;
       }
       .page {
         position: absolute;
@@ -218,14 +191,8 @@
         pointer-events: none;
       }
 
-      /* ===== PAGE: HOME ===== */
       .home-page {
-        background: linear-gradient(
-          160deg,
-          #fff0f6 0%,
-          #ffd6e7 50%,
-          #ffb3cf 100%
-        );
+        background: rgba(255, 159, 196, 0.65);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -238,17 +205,18 @@
         font-size: 11px;
         letter-spacing: 0.28em;
         text-transform: uppercase;
-        color: var(--rose);
-        opacity: 0.75;
+        color: #fff;
+        opacity: 0.85;
         margin-bottom: 16px;
       }
       .main-title {
         font-family: "Playfair Display", serif;
         font-size: clamp(48px, 13vw, 96px);
-        color: var(--rose-deep);
+        color: #fff;
         line-height: 1;
         font-style: italic;
         animation: floatTitle 4s ease-in-out infinite;
+        text-shadow: 0 4px 20px rgba(194, 24, 91, 0.5);
       }
       @keyframes floatTitle {
         0%,
@@ -261,14 +229,15 @@
       }
       .main-title span {
         font-style: normal;
-        color: var(--rose);
+        color: #fff0f6;
       }
       .subtitle {
         font-family: "Dancing Script", cursive;
         font-size: clamp(16px, 4vw, 24px);
-        color: var(--rose-deep);
+        color: #fff;
         margin-top: 14px;
-        opacity: 0.8;
+        opacity: 0.95;
+        text-shadow: 0 2px 8px rgba(194, 24, 91, 0.4);
       }
       .hearts-row {
         display: flex;
@@ -287,23 +256,43 @@
         }
       }
 
-      /* ===== PAGE: PHOTOS ===== */
       .photos-page {
         padding: 28px 20px 24px;
-        background: white;
+        background: rgba(255, 159, 196, 0.65);
         min-height: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+      .photos-page::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 182, 193, 0.16) 0%,
+            transparent 18%
+          ),
+          radial-gradient(
+            circle at 85% 15%,
+            rgba(255, 105, 180, 0.14) 0%,
+            transparent 16%
+          );
+        opacity: 0.65;
+        pointer-events: none;
       }
       .page-heading {
         font-family: "Playfair Display", serif;
         font-size: clamp(26px, 7vw, 42px);
-        color: var(--rose-deep);
+        color: #fff;
         font-style: italic;
         margin-bottom: 6px;
+        text-shadow: 0 2px 10px rgba(194, 24, 91, 0.4);
       }
       .page-sub {
         font-size: 12px;
-        color: var(--rose);
-        opacity: 0.7;
+        color: #fff;
+        opacity: 0.85;
         letter-spacing: 0.15em;
         text-transform: uppercase;
         margin-bottom: 24px;
@@ -335,7 +324,6 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
-        background: rgba(255, 255, 255, 0.05);
       }
       .slide-placeholder {
         text-align: center;
@@ -375,73 +363,6 @@
         justify-content: center;
         max-width: 200px;
       }
-      .photos-page {
-        padding: 28px 20px 24px;
-        background: white;
-        min-height: 100%;
-        position: relative;
-        overflow: hidden;
-      }
-      .photos-page::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image:
-          radial-gradient(
-            circle at 20% 20%,
-            rgba(255, 182, 193, 0.16) 0%,
-            transparent 18%
-          ),
-          radial-gradient(
-            circle at 85% 15%,
-            rgba(255, 105, 180, 0.14) 0%,
-            transparent 16%
-          ),
-          radial-gradient(
-            circle at 50% 80%,
-            rgba(255, 223, 241, 0.16) 0%,
-            transparent 22%
-          );
-        opacity: 0.65;
-        pointer-events: none;
-        animation: loveGlow 12s linear infinite;
-      }
-      .photos-page::after {
-        content: "💗 💕 💝 💖 💓 💗 💕";
-        position: absolute;
-        top: 110%;
-        left: -20%;
-        width: 140%;
-        height: 120%;
-        font-size: 22px;
-        color: rgba(232, 67, 122, 0.08);
-        display: flex;
-        flex-wrap: wrap;
-        align-content: flex-start;
-        justify-content: space-between;
-        opacity: 0.35;
-        pointer-events: none;
-        animation: heartsDrift 28s linear infinite;
-      }
-      @keyframes loveGlow {
-        0% {
-          transform: translate3d(0, 0, 0);
-        }
-        50% {
-          transform: translate3d(0, 8px, 0);
-        }
-        100% {
-          transform: translate3d(0, 0, 0);
-        }
-      }
-      @keyframes heartsDrift {
-        0% {
-          transform: translate3d(0, 0, 0);
-        }
-        100% {
-          transform: translate3d(10%, -60%, 0);
-        }
-      }
       .dot {
         width: 7px;
         height: 7px;
@@ -457,7 +378,6 @@
         background: var(--rose);
         transform: scale(1.5);
       }
-
       .photo-grid {
         display: none;
         grid-template-columns: repeat(3, 1fr);
@@ -480,29 +400,10 @@
         object-fit: cover;
         transition: transform 0.2s;
       }
-      .photo-thumb-item:active img {
-        transform: scale(0.96);
-      }
-      .photo-thumb-item.sel::after {
-        content: "✓";
-        position: absolute;
-        inset: 0;
-        background: rgba(232, 67, 122, 0.55);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 22px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
 
-      /* ===== PAGE: MESSAGE ===== */
       .message-page {
         padding: 28px 20px 24px;
-        background: linear-gradient(135deg, #fff0f6, #ffd6e7);
+        background: rgba(255, 159, 196, 0.65);
         min-height: 100%;
       }
       .message-card {
@@ -554,10 +455,9 @@
         font-weight: 700;
       }
 
-      /* ===== PAGE: VIDEOS ===== */
       .videos-page {
         padding: 28px 20px 24px;
-        background: var(--cream);
+        background: rgba(255, 159, 196, 0.65);
         min-height: 100%;
       }
       .video-grid {
@@ -587,14 +487,6 @@
         height: 100%;
         object-fit: cover;
       }
-      .video-play-overlay {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.12);
-      }
       .play-circle {
         width: 48px;
         height: 48px;
@@ -605,6 +497,10 @@
         justify-content: center;
         font-size: 18px;
         color: var(--rose);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
       .video-info {
         padding: 14px 16px 16px;
@@ -673,7 +569,170 @@
         margin-bottom: 10px;
       }
 
-      /* ===== VIDEO MODAL ===== */
+      /* ===== RECORD PAGE ===== */
+      .record-page {
+        padding: 28px 20px 24px;
+        background: rgba(255, 159, 196, 0.65);
+        min-height: 100%;
+      }
+      .record-hint {
+        font-family: "Dancing Script", cursive;
+        font-size: 18px;
+        color: #fff;
+        opacity: 0.95;
+        text-align: center;
+        margin-bottom: 26px;
+        text-shadow: 0 2px 8px rgba(194, 24, 91, 0.4);
+      }
+      .record-card {
+        background: white;
+        border-radius: 24px;
+        padding: 36px 24px;
+        max-width: 480px;
+        margin: 0 auto;
+        box-shadow: 0 12px 48px rgba(194, 24, 91, 0.18);
+        text-align: center;
+      }
+      .record-visual {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .record-circle {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        box-shadow: 0 6px 24px rgba(232, 67, 122, 0.4);
+        z-index: 2;
+        position: relative;
+        transition: transform 0.2s;
+      }
+      .record-circle.recording {
+        animation: recPulseScale 1.2s ease-in-out infinite;
+      }
+      @keyframes recPulseScale {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.08);
+        }
+      }
+      .record-pulse {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 3px solid var(--rose);
+        opacity: 0;
+      }
+      .record-pulse.active {
+        animation: recPulseRing 1.5s ease-out infinite;
+      }
+      @keyframes recPulseRing {
+        0% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(1.6);
+          opacity: 0;
+        }
+      }
+      .record-timer {
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        color: var(--rose-deep);
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+      .record-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .record-btn {
+        padding: 13px;
+        border-radius: 12px;
+        border: none;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+      }
+      .record-btn:active {
+        transform: scale(0.97);
+      }
+      .record-btn.start {
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        color: white;
+      }
+      .record-btn.stop {
+        background: #ff4444;
+        color: white;
+      }
+      .record-btn.send {
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        color: white;
+      }
+      .record-btn.retry {
+        background: transparent;
+        color: var(--rose);
+        border: 1.5px solid var(--rose);
+      }
+      .recordings-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .recording-item {
+        background: white;
+        border-radius: 16px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 18px rgba(194, 24, 91, 0.1);
+      }
+      .recording-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--rose-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .recording-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .recording-date {
+        font-size: 11px;
+        color: #aaa;
+        margin-bottom: 4px;
+      }
+      .recording-item audio {
+        width: 100%;
+        height: 32px;
+      }
+
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -720,7 +779,6 @@
         justify-content: center;
       }
 
-      /* ===== ADMIN TRIGGER ===== */
       .admin-trigger {
         position: fixed;
         bottom: calc(var(--nav-h) + 12px);
@@ -744,7 +802,6 @@
         opacity: 1;
       }
 
-      /* ===== ADMIN PANEL ===== */
       .admin-overlay {
         position: fixed;
         inset: 0;
@@ -772,8 +829,6 @@
       .admin-panel.open {
         transform: translateX(0);
       }
-
-      /* Admin header */
       .admin-header {
         padding: 20px;
         background: linear-gradient(135deg, var(--rose), var(--rose-deep));
@@ -806,8 +861,6 @@
         align-items: center;
         justify-content: center;
       }
-
-      /* Admin tabs */
       .admin-tabs {
         display: flex;
         border-bottom: 1px solid rgba(232, 67, 122, 0.15);
@@ -844,42 +897,6 @@
         color: var(--rose);
         border-bottom-color: var(--rose);
       }
-
-      /* Admin login */
-      #adminLogin {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-      }
-      #adminLogin .admin-login-body {
-        flex: 1;
-        padding: 32px 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        justify-content: center;
-      }
-      #adminLogin h3 {
-        font-family: "Playfair Display", serif;
-        font-size: 22px;
-        color: var(--rose-deep);
-      }
-
-      /* Admin tab content */
-      #adminContent {
-        display: none;
-        flex-direction: column;
-        flex: 1;
-        overflow: hidden;
-      }
-      .admin-tab-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 20px;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      /* Admin form elements */
       .admin-input {
         width: 100%;
         padding: 11px 14px;
@@ -933,9 +950,6 @@
         color: var(--rose);
         border: 1.5px solid var(--rose);
       }
-      .admin-btn.danger {
-        background: linear-gradient(135deg, #ff4444, #cc0000);
-      }
       .admin-file-label {
         display: block;
         width: 100%;
@@ -960,8 +974,6 @@
         padding-bottom: 8px;
         border-bottom: 1px solid var(--rose-light);
       }
-
-      /* Admin item lists */
       .admin-list {
         display: flex;
         flex-direction: column;
@@ -1015,13 +1027,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s;
       }
-      .admin-del-btn:active {
-        background: rgba(255, 68, 68, 0.25);
-      }
-
-      /* Song active badge */
       .badge {
         display: inline-block;
         padding: 2px 8px;
@@ -1032,8 +1038,12 @@
         color: #2e7d32;
         margin-left: 6px;
       }
-
-      /* Toast */
+      .admin-tab-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        -webkit-overflow-scrolling: touch;
+      }
       .toast {
         position: fixed;
         top: calc(var(--music-h) + 12px);
@@ -1053,8 +1063,6 @@
       .toast.show {
         opacity: 1;
       }
-
-      /* Helpers */
       .label {
         font-size: 11px;
         font-weight: 500;
@@ -1064,7 +1072,6 @@
         margin-bottom: 6px;
         display: block;
       }
-
       @media (max-width: 380px) {
         .progress-wrap {
           display: none;
@@ -1079,8 +1086,6 @@
     <canvas id="fallingCanvas"></canvas>
     <div id="yt-player"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
-
-    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
     <!-- VIDEO MODAL -->
@@ -1091,6 +1096,8 @@
           onclick="
             document.getElementById('videoModal').classList.remove('open');
             document.getElementById('modalVideo').pause();
+            videoModalOpen = false;
+            resumeSong();
           "
         >
           ✕
@@ -1103,7 +1110,6 @@
 
     <!-- MUSIC BAR -->
     <div class="music-bar">
-      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
       <div class="song-info">
         <div class="song-title" id="songTitle">Loading...</div>
         <div class="song-artist" id="songArtist">♪</div>
@@ -1119,7 +1125,6 @@
 
     <!-- PAGES -->
     <div class="pages-wrap">
-      <!-- HOME -->
       <div class="page active" id="page-home">
         <div class="home-page">
           <div class="hero-eyebrow">a love story — just for you</div>
@@ -1137,7 +1142,6 @@
         </div>
       </div>
 
-      <!-- PHOTOS -->
       <div class="page" id="page-photos">
         <div class="photos-page">
           <div class="page-sub">moments captured</div>
@@ -1157,7 +1161,6 @@
         </div>
       </div>
 
-      <!-- MESSAGE -->
       <div class="page" id="page-message">
         <div class="message-page">
           <div class="page-sub" style="margin-bottom: 6px">from my heart</div>
@@ -1172,7 +1175,6 @@
         </div>
       </div>
 
-      <!-- VIDEOS -->
       <div class="page" id="page-videos">
         <div class="videos-page">
           <div class="page-sub">our moments</div>
@@ -1184,39 +1186,90 @@
           </div>
         </div>
       </div>
+
+      <div class="page" id="page-record">
+        <div class="record-page">
+          <div class="page-sub">just for you</div>
+          <h2 class="page-heading">Send Me Your Voice 🎙️</h2>
+          <p class="record-hint">
+            Record a little voice note for me — tell me anything you want, then
+            send it 💕
+          </p>
+
+          <div class="record-card">
+            <div class="record-visual" id="recordVisual">
+              <div class="record-circle" id="recordCircle">🎙️</div>
+              <div class="record-pulse" id="recordPulse"></div>
+            </div>
+            <div class="record-timer" id="recordTimer">0:00</div>
+            <div class="record-controls" id="recordControls">
+              <button
+                class="record-btn start"
+                id="recordStartBtn"
+                onclick="startRecording()"
+              >
+                Start Recording
+              </button>
+            </div>
+            <div
+              class="record-controls"
+              id="recordReviewControls"
+              style="display: none"
+            >
+              <audio
+                id="recordPreview"
+                controls
+                style="width: 100%; margin-bottom: 14px"
+              ></audio>
+              <button
+                class="record-btn send"
+                id="recordSendBtn"
+                onclick="sendRecording()"
+              >
+                💕 Send It
+              </button>
+              <button class="record-btn retry" onclick="resetRecording()">
+                Record Again
+              </button>
+            </div>
+          </div>
+
+          <p class="page-sub" style="margin-top: 32px">
+            your voice notes to me
+          </p>
+          <div class="recordings-list" id="recordingsList">
+            <div class="no-content" style="padding: 24px 20px">
+              <span class="emoji">🎙️</span>Nothing recorded yet
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <button class="nav-btn active" id="nav-home" onclick="goPage('home')">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">Home</span>
+        <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
       </button>
       <button class="nav-btn" id="nav-photos" onclick="goPage('photos')">
-        <span class="nav-icon">📸</span>
-        <span class="nav-label">Photos</span>
+        <span class="nav-icon">📸</span><span class="nav-label">Photos</span>
       </button>
       <button class="nav-btn" id="nav-message" onclick="goPage('message')">
-        <span class="nav-icon">💌</span>
-        <span class="nav-label">Message</span>
+        <span class="nav-icon">💌</span><span class="nav-label">Message</span>
       </button>
       <button class="nav-btn" id="nav-videos" onclick="goPage('videos')">
-        <span class="nav-icon">🎬</span>
-        <span class="nav-label">Videos</span>
+        <span class="nav-icon">🎬</span><span class="nav-label">Videos</span>
+      </button>
+      <button class="nav-btn" id="nav-record" onclick="goPage('record')">
+        <span class="nav-icon">🎙️</span><span class="nav-label">Record</span>
       </button>
     </nav>
 
-    <!-- ADMIN TRIGGER -->
-    <button class="admin-trigger" id="adminTrigger" onclick="openAdmin()">
-      ⚙
-    </button>
-
-    <!-- ADMIN OVERLAY -->
+    <button class="admin-trigger" onclick="openAdmin()">⚙</button>
     <div class="admin-overlay" id="adminOverlay" onclick="closeAdmin()"></div>
 
     <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel">
-      <!-- LOGIN -->
       <div
         id="adminLogin"
         style="display: flex; flex-direction: column; height: 100%"
@@ -1224,12 +1277,29 @@
         <div class="admin-header">
           <div class="admin-header-text">
             <h2>Admin Panel 🔐</h2>
-            <p>Secret access — only admin Mwaura</p>
+            <p>Secret access — only you</p>
           </div>
           <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
         </div>
-        <div class="admin-login-body">
-          <h3>Enter your password</h3>
+        <div
+          style="
+            flex: 1;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            justify-content: center;
+          "
+        >
+          <h3
+            style="
+              font-family: &quot;Playfair Display&quot;, serif;
+              font-size: 22px;
+              color: var(--rose-deep);
+            "
+          >
+            Enter your password
+          </h3>
           <input
             type="password"
             class="admin-input"
@@ -1241,7 +1311,6 @@
         </div>
       </div>
 
-      <!-- LOGGED IN -->
       <div
         id="adminContent"
         style="display: none; flex-direction: column; height: 100%"
@@ -1253,8 +1322,6 @@
           </div>
           <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
         </div>
-
-        <!-- TABS -->
         <div class="admin-tabs">
           <button
             class="admin-tab active"
@@ -1285,8 +1352,6 @@
             <span class="tab-icon">🎬</span>Videos
           </button>
         </div>
-
-        <!-- TAB: PHOTOS -->
         <div class="admin-tab-body" id="abody-photos">
           <p class="admin-section-title">Add Photos to Slideshow</p>
           <label class="label">Caption for new photos</label>
@@ -1296,16 +1361,14 @@
             id="photoCaption"
             placeholder="e.g. My favourite smile 💗"
           />
-          <label class="admin-file-label">
-            📷 Choose Photos (multiple OK)
-            <input
+          <label class="admin-file-label"
+            >📷 Choose Photos (multiple OK)<input
               type="file"
               accept="image/*"
               multiple
               style="display: none"
               onchange="uploadPhotos(event)"
-            />
-          </label>
+          /></label>
           <p class="admin-section-title" style="margin-top: 16px">
             Current Photos
           </p>
@@ -1313,8 +1376,6 @@
             <div style="color: #ccc; font-size: 13px">No photos yet</div>
           </div>
         </div>
-
-        <!-- TAB: SONG -->
         <div class="admin-tab-body" id="abody-song" style="display: none">
           <p class="admin-section-title">Change Background Song</p>
           <label class="label">YouTube Video ID</label>
@@ -1356,8 +1417,6 @@
             <div style="color: #ccc; font-size: 13px">Loading...</div>
           </div>
         </div>
-
-        <!-- TAB: MESSAGE -->
         <div class="admin-tab-body" id="abody-message" style="display: none">
           <p class="admin-section-title">Edit Your Love Message</p>
           <label class="label">Message</label>
@@ -1377,8 +1436,6 @@
             💌 Save Message
           </button>
         </div>
-
-        <!-- TAB: VIDEOS -->
         <div class="admin-tab-body" id="abody-videos" style="display: none">
           <p class="admin-section-title">Upload a Moment Video</p>
           <label class="label">Video Title</label>
@@ -1388,15 +1445,13 @@
             id="videoTitle"
             placeholder="e.g. Our first date 💕"
           />
-          <label class="admin-file-label">
-            🎬 Choose Video
-            <input
+          <label class="admin-file-label"
+            >🎬 Choose Video<input
               type="file"
               accept="video/*"
               style="display: none"
               onchange="uploadVideo(event)"
-            />
-          </label>
+          /></label>
           <p class="admin-section-title" style="margin-top: 16px">
             Current Videos
           </p>
@@ -1404,7 +1459,6 @@
             <div style="color: #ccc; font-size: 13px">No videos yet</div>
           </div>
         </div>
-
         <div style="padding: 0 20px 20px; flex-shrink: 0; background: white">
           <button class="admin-btn secondary" onclick="adminLogout()">
             Logout
@@ -1425,17 +1479,15 @@
         wantPlay = true,
         playing = false,
         progTimer = null;
+      let videoModalOpen = false;
       let currentAdminTab = "photos";
 
-      // ===== NAVIGATION =====
       function goPage(name) {
         if (name === currentPage) return;
         const prev = document.getElementById("page-" + currentPage);
         const next = document.getElementById("page-" + name);
         prev.classList.add("exit-left");
-        setTimeout(() => {
-          prev.classList.remove("active", "exit-left");
-        }, 320);
+        setTimeout(() => prev.classList.remove("active", "exit-left"), 320);
         next.classList.add("active");
         document
           .querySelectorAll(".nav-btn")
@@ -1444,7 +1496,7 @@
         currentPage = name;
       }
 
-      // ===== FALLING HEARTS =====
+      // ===== FALLING HEARTS, DOLLS & FLOWERS =====
       const canvas = document.getElementById("fallingCanvas");
       const ctx = canvas.getContext("2d");
       function resize() {
@@ -1453,49 +1505,67 @@
       }
       resize();
       addEventListener("resize", resize);
+
       const syms = [
         "💕",
         "💗",
         "💖",
         "💓",
         "💝",
+        "💗",
+        "💖",
+        "💕",
         "🌸",
-        "✨",
+        "🌸",
+        "🌺",
         "🌷",
-        "🫶",
+        "🌹",
         "💐",
         "🦋",
+        "🦋",
+        "👗",
+        "👗",
+        "👒",
         "🎀",
+        "🎀",
+        "🎀",
+        "💎",
+        "💎",
+        "💍",
+        "✨",
+        "🩷",
+        "🫶",
+        "💫",
       ];
       const parts = [];
       function mkP() {
         return {
           x: Math.random() * canvas.width,
-          y: -50,
+          y: -60,
           s: syms[Math.floor(Math.random() * syms.length)],
-          sz: 12 + Math.random() * 20,
-          vy: 0.7 + Math.random() * 1.8,
-          vx: (Math.random() - 0.5) * 0.7,
+          sz: 18 + Math.random() * 32,
+          vy: 0.9 + Math.random() * 2.2,
+          vx: (Math.random() - 0.5) * 1.0,
           rot: Math.random() * 360,
-          rv: (Math.random() - 0.5) * 2,
-          a: 0.4 + Math.random() * 0.4,
+          rv: (Math.random() - 0.5) * 2.5,
+          a: 0.55 + Math.random() * 0.45,
           w: Math.random() * Math.PI * 2,
-          wv: 0.02 + Math.random() * 0.03,
+          wv: 0.015 + Math.random() * 0.035,
         };
       }
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 80; i++) {
         const p = mkP();
         p.y = Math.random() * innerHeight;
         parts.push(p);
       }
       (function frame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (Math.random() < 0.07) parts.push(mkP());
-        if (parts.length > 70) parts.splice(0, 6);
+        if (Math.random() < 0.22) parts.push(mkP());
+        if (parts.length > 150) parts.splice(0, 20);
         parts.forEach((p) => {
           p.y += p.vy;
           p.w += p.wv;
-          p.x += p.vx + Math.sin(p.w) * 0.5;
+          p.x += p.vx + Math.sin(p.w) * 0.7;
           p.rot += p.rv;
           ctx.save();
           ctx.globalAlpha = p.a;
@@ -1504,10 +1574,13 @@
           ctx.font = p.sz + "px serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
+          ctx.shadowColor = "rgba(255,255,255,0.9)";
+          ctx.shadowBlur = p.sz * 0.35;
+          ctx.fillText(p.s, 0, 0);
           ctx.fillText(p.s, 0, 0);
           ctx.restore();
-          if (p.y > canvas.height + 60) {
-            p.y = -50;
+          if (p.y > canvas.height + 80) {
+            p.y = -60;
             p.x = Math.random() * canvas.width;
           }
         });
@@ -1547,16 +1620,15 @@
             onStateChange: (e) => {
               if (e.data === YT.PlayerState.PLAYING) {
                 playing = true;
-                document.getElementById("playBtn").textContent = "⏸";
                 startProg();
               } else if (
                 e.data === YT.PlayerState.PAUSED ||
                 e.data === YT.PlayerState.ENDED
               ) {
                 playing = false;
-                document.getElementById("playBtn").textContent = "▶";
                 stopProg();
-                if (e.data === YT.PlayerState.ENDED) ytPlayer.seekTo(0);
+                if (e.data === YT.PlayerState.ENDED && !videoModalOpen)
+                  ytPlayer.seekTo(0);
               }
             },
           },
@@ -1585,13 +1657,11 @@
           progTimer = null;
         }
       }
-      function togglePlay() {
-        if (!ytReady) {
-          wantPlay = true;
-          return;
-        }
-        if (playing) ytPlayer.pauseVideo();
-        else ytPlayer.playVideo();
+      function pauseSong() {
+        if (ytReady && playing) ytPlayer.pauseVideo();
+      }
+      function resumeSong() {
+        if (ytReady && !playing && !videoModalOpen) ytPlayer.playVideo();
       }
       function seekTo(e) {
         if (!ytReady || !ytPlayer.getDuration) return;
@@ -1613,9 +1683,9 @@
 
       // ===== SLIDESHOW =====
       function buildSlideshow(photos) {
-        const inner = document.getElementById("slideshowInner");
-        const dots = document.getElementById("slideDots");
-        const grid = document.getElementById("photoGrid");
+        const inner = document.getElementById("slideshowInner"),
+          dots = document.getElementById("slideDots"),
+          grid = document.getElementById("photoGrid");
         inner.innerHTML = "";
         dots.innerHTML = "";
         grid.innerHTML = "";
@@ -1627,17 +1697,14 @@
           return;
         }
         photos.forEach((p, i) => {
-          // Slide
           const div = document.createElement("div");
           div.className = "slide" + (i === 0 ? " active" : "");
           div.innerHTML = `<img src="${p.url}" alt="${p.caption || ""}" loading="lazy">`;
           inner.appendChild(div);
-          // Dot
           const dot = document.createElement("div");
           dot.className = "dot" + (i === 0 ? " active" : "");
           dot.onclick = () => goSlide(i);
           dots.appendChild(dot);
-          // Grid thumb
           const th = document.createElement("div");
           th.className = "photo-thumb-item";
           th.innerHTML = `<img src="${p.url}" loading="lazy">`;
@@ -1664,10 +1731,6 @@
       function nextSlide() {
         if (slides.length) goSlide((currentSlide + 1) % slides.length);
       }
-      function prevSlide() {
-        if (slides.length)
-          goSlide((currentSlide - 1 + slides.length) % slides.length);
-      }
       function updateCaption() {
         const cap = document.getElementById("slideCaption");
         if (slides[currentSlide]?.caption) {
@@ -1688,20 +1751,7 @@
         videos.forEach((v) => {
           const card = document.createElement("div");
           card.className = "video-card";
-          card.innerHTML = `
-      <div class="video-thumb" onclick="openModal('${v.url}')">
-        <video src="${v.url}" muted playsinline preload="metadata"></video>
-      </div>
-      <div class="video-info">
-        <div class="video-title">${v.title}</div>
-        <div class="comments-area">
-          <div class="comment-list" id="clist-${v._id}"></div>
-          <div class="comment-form">
-            <input class="comment-input" id="cinput-${v._id}" placeholder="Leave a comment 💕" onkeydown="if(event.key==='Enter')postComment('${v._id}')">
-            <button class="comment-btn" onclick="postComment('${v._id}')">💕</button>
-          </div>
-        </div>
-      </div>`;
+          card.innerHTML = `<div class="video-thumb" onclick="openModal('${v.url}')"><video src="${v.url}" muted playsinline preload="metadata"></video><div class="play-circle">▶</div></div><div class="video-info"><div class="video-title">${v.title}</div><div class="comments-area"><div class="comment-list" id="clist-${v._id}"></div><div class="comment-form"><input class="comment-input" id="cinput-${v._id}" placeholder="Leave a comment 💕" onkeydown="if(event.key==='Enter')postComment('${v._id}')"><button class="comment-btn" onclick="postComment('${v._id}')">💕</button></div></div></div>`;
           grid.appendChild(card);
           loadComments(v._id);
         });
@@ -1735,15 +1785,23 @@
         loadComments(vid);
       }
       function openModal(url) {
+        videoModalOpen = true;
+        pauseSong();
         const v = document.getElementById("modalVideo");
         v.src = url;
         v.play();
         document.getElementById("videoModal").classList.add("open");
+        v.onended = () => {
+          videoModalOpen = false;
+          resumeSong();
+        };
       }
       function closeModal(e) {
         if (e.target === document.getElementById("videoModal")) {
           document.getElementById("modalVideo").pause();
           document.getElementById("videoModal").classList.remove("open");
+          videoModalOpen = false;
+          resumeSong();
         }
       }
 
@@ -1771,21 +1829,145 @@
           }
           buildSlideshow(data.photos || []);
           buildVideos(data.videos || []);
+          buildRecordings(data.recordings || []);
         } catch (e) {
           console.error(e);
         }
       }
       loadPublicData();
 
-      // ===== TOAST =====
+      // ===== RECORDING (voice notes) =====
+      let mediaRecorder = null;
+      let recordedChunks = [];
+      let recordedBlob = null;
+      let recordTimerInterval = null;
+      let recordSeconds = 0;
+      let recordStream = null;
+
+      function fmtTimer(s) {
+        const m = Math.floor(s / 60),
+          sec = s % 60;
+        return m + ":" + (sec < 10 ? "0" : "") + sec;
+      }
+
+      async function startRecording() {
+        try {
+          recordStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+        } catch (e) {
+          showToast("Mic access needed 🎙️");
+          return;
+        }
+        recordedChunks = [];
+        recordSeconds = 0;
+        mediaRecorder = new MediaRecorder(recordStream);
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          recordedBlob = new Blob(recordedChunks, { type: "audio/webm" });
+          const url = URL.createObjectURL(recordedBlob);
+          document.getElementById("recordPreview").src = url;
+          document.getElementById("recordControls").style.display = "none";
+          document.getElementById("recordReviewControls").style.display =
+            "flex";
+          document.getElementById("recordReviewControls").style.flexDirection =
+            "column";
+          recordStream.getTracks().forEach((t) => t.stop());
+        };
+        mediaRecorder.start();
+
+        document.getElementById("recordCircle").textContent = "⏹️";
+        document.getElementById("recordCircle").classList.add("recording");
+        document.getElementById("recordPulse").classList.add("active");
+        document.getElementById("recordStartBtn").textContent =
+          "Stop Recording";
+        document.getElementById("recordStartBtn").classList.add("stop");
+        document.getElementById("recordStartBtn").onclick = stopRecording;
+
+        recordTimerInterval = setInterval(() => {
+          recordSeconds++;
+          document.getElementById("recordTimer").textContent =
+            fmtTimer(recordSeconds);
+        }, 1000);
+      }
+
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive")
+          mediaRecorder.stop();
+        clearInterval(recordTimerInterval);
+        document.getElementById("recordCircle").textContent = "🎙️";
+        document.getElementById("recordCircle").classList.remove("recording");
+        document.getElementById("recordPulse").classList.remove("active");
+      }
+
+      function resetRecording() {
+        recordedBlob = null;
+        recordSeconds = 0;
+        document.getElementById("recordTimer").textContent = "0:00";
+        document.getElementById("recordReviewControls").style.display = "none";
+        document.getElementById("recordControls").style.display = "flex";
+        document.getElementById("recordStartBtn").textContent =
+          "Start Recording";
+        document.getElementById("recordStartBtn").classList.remove("stop");
+        document.getElementById("recordStartBtn").onclick = startRecording;
+      }
+
+      const RECORDING_KEY = "our-love-2024";
+      async function sendRecording() {
+        if (!recordedBlob) return;
+        showToast("Sending your voice... 💕");
+        const fd = new FormData();
+        fd.append("recording", recordedBlob, "voice-note.webm");
+        fd.append("key", RECORDING_KEY);
+        try {
+          await fetch(`${API}/api/admin/recordings`, {
+            method: "POST",
+            body: fd,
+          });
+          showToast("Sent with love 💕");
+          resetRecording();
+          await loadPublicData();
+        } catch (e) {
+          showToast("Couldn't send — try again");
+        }
+      }
+
+      function buildRecordings(recordings) {
+        const list = document.getElementById("recordingsList");
+        if (!recordings.length) {
+          list.innerHTML =
+            '<div class="no-content" style="padding:24px 20px"><span class="emoji">🎙️</span>Nothing recorded yet</div>';
+          return;
+        }
+        list.innerHTML = recordings
+          .map((r) => {
+            const date = r.createdAt
+              ? new Date(r.createdAt).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
+            return `<div class="recording-item">
+            <div class="recording-icon">🎙️</div>
+            <div class="recording-info">
+              <div class="recording-date">${date}</div>
+              <audio controls src="${r.url}"></audio>
+            </div>
+          </div>`;
+          })
+          .join("");
+      }
+
       function showToast(msg) {
         const t = document.getElementById("toast");
         t.textContent = msg;
         t.classList.add("show");
         setTimeout(() => t.classList.remove("show"), 2600);
       }
-
-      // ===== ADMIN =====
       function openAdmin() {
         document.getElementById("adminOverlay").classList.add("open");
         document.getElementById("adminPanel").classList.add("open");
@@ -1794,7 +1976,6 @@
         document.getElementById("adminOverlay").classList.remove("open");
         document.getElementById("adminPanel").classList.remove("open");
       }
-
       function switchAdminTab(tab) {
         currentAdminTab = tab;
         document
@@ -1807,7 +1988,6 @@
               (b.style.display = b.id === "abody-" + tab ? "block" : "none"),
           );
       }
-
       async function adminLogin() {
         const pass = document.getElementById("adminPass").value;
         const res = await fetch(`${API}/api/admin/login`, {
@@ -1820,9 +2000,7 @@
           document.getElementById("adminContent").style.display = "flex";
           loadAdminData();
           showToast("Welcome back 💕");
-        } else {
-          showToast("Wrong password 🔐");
-        }
+        } else showToast("Wrong password 🔐");
       }
       async function adminLogout() {
         await fetch(`${API}/api/admin/logout`, { method: "POST" });
@@ -1831,7 +2009,6 @@
         document.getElementById("adminPass").value = "";
         closeAdmin();
       }
-
       async function loadAdminData() {
         const res = await fetch(`${API}/api/public`);
         const data = await res.json();
@@ -1844,24 +2021,16 @@
           document.getElementById("songTitleInput").value = data.song.title;
           document.getElementById("songArtistInput").value = data.song.artist;
         }
-
-        // Photos list
         const pl = document.getElementById("adminPhotoList");
         pl.innerHTML =
           data.photos && data.photos.length
             ? data.photos
                 .map(
-                  (p) => `
-    <div class="admin-list-item">
-      <img class="admin-list-thumb" src="${p.url}">
-      <div class="admin-list-info"><div class="admin-list-title">${p.caption || "No caption"}</div></div>
-      <button class="admin-del-btn" onclick="deletePhoto('${p._id}')">🗑</button>
-    </div>`,
+                  (p) =>
+                    `<div class="admin-list-item"><img class="admin-list-thumb" src="${p.url}"><div class="admin-list-info"><div class="admin-list-title">${p.caption || "No caption"}</div></div><button class="admin-del-btn" onclick="deletePhoto('${p._id}')">🗑</button></div>`,
                 )
                 .join("")
             : '<div style="color:#ccc;font-size:13px">No photos yet</div>';
-
-        // Songs list (all songs)
         const sl = document.getElementById("adminSongList");
         const allSongs = await fetch(`${API}/api/admin/songs`)
           .then((r) => r.json())
@@ -1869,36 +2038,22 @@
         sl.innerHTML = allSongs.length
           ? allSongs
               .map(
-                (s) => `
-    <div class="admin-list-item">
-      <div style="font-size:28px;flex-shrink:0">🎵</div>
-      <div class="admin-list-info">
-        <div class="admin-list-title">${s.title}${s.active ? '<span class="badge">Playing</span>' : ""}</div>
-        <div class="admin-list-sub">${s.artist} · ${s.youtubeId}</div>
-      </div>
-      <button class="admin-del-btn" onclick="deleteSong('${s._id}')">🗑</button>
-    </div>`,
+                (s) =>
+                  `<div class="admin-list-item"><div style="font-size:28px;flex-shrink:0">🎵</div><div class="admin-list-info"><div class="admin-list-title">${s.title}${s.active ? '<span class="badge">Playing</span>' : ""}</div><div class="admin-list-sub">${s.artist} · ${s.youtubeId}</div></div><button class="admin-del-btn" onclick="deleteSong('${s._id}')">🗑</button></div>`,
               )
               .join("")
           : '<div style="color:#ccc;font-size:13px">No songs added yet</div>';
-
-        // Videos list
         const vl = document.getElementById("adminVideoList");
         vl.innerHTML =
           data.videos && data.videos.length
             ? data.videos
                 .map(
-                  (v) => `
-    <div class="admin-list-item">
-      <video class="admin-list-thumb" src="${v.url}" muted></video>
-      <div class="admin-list-info"><div class="admin-list-title">${v.title}</div></div>
-      <button class="admin-del-btn" onclick="deleteVideo('${v._id}')">🗑</button>
-    </div>`,
+                  (v) =>
+                    `<div class="admin-list-item"><video class="admin-list-thumb" src="${v.url}" muted></video><div class="admin-list-info"><div class="admin-list-title">${v.title}</div></div><button class="admin-del-btn" onclick="deleteVideo('${v._id}')">🗑</button></div>`,
                 )
                 .join("")
             : '<div style="color:#ccc;font-size:13px">No videos yet</div>';
       }
-
       async function uploadPhotos(event) {
         const caption = document.getElementById("photoCaption").value || "💕";
         const files = Array.from(event.target.files);
@@ -1914,7 +2069,6 @@
         await loadPublicData();
         loadAdminData();
       }
-
       async function uploadVideo(event) {
         const title =
           document.getElementById("videoTitle").value || "Our Moment 💕";
@@ -1930,11 +2084,10 @@
         await loadPublicData();
         loadAdminData();
       }
-
       async function saveSong() {
-        const ytId = document.getElementById("songYtId").value.trim();
-        const title = document.getElementById("songTitleInput").value.trim();
-        const artist = document.getElementById("songArtistInput").value.trim();
+        const ytId = document.getElementById("songYtId").value.trim(),
+          title = document.getElementById("songTitleInput").value.trim(),
+          artist = document.getElementById("songArtistInput").value.trim();
         if (!ytId || !title) return showToast("Fill in the song details");
         await fetch(`${API}/api/admin/song`, {
           method: "POST",
@@ -1948,10 +2101,9 @@
         await loadPublicData();
         loadAdminData();
       }
-
       async function saveMessage() {
-        const content = document.getElementById("msgContent").value.trim();
-        const signature = document.getElementById("msgSig").value.trim();
+        const content = document.getElementById("msgContent").value.trim(),
+          signature = document.getElementById("msgSig").value.trim();
         if (!content) return showToast("Write a message first 💌");
         await fetch(`${API}/api/admin/message`, {
           method: "PUT",
@@ -1961,7 +2113,6 @@
         showToast("Message saved 💌");
         await loadPublicData();
       }
-
       async function deletePhoto(id) {
         if (!confirm("Delete this photo?")) return;
         await fetch(`${API}/api/admin/photos/${id}`, { method: "DELETE" });
