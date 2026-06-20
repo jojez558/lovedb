@@ -7,6 +7,9 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>My Love For You 💕</title>
+    <link rel="preconnect" href="https://www.youtube.com" />
+    <link rel="preconnect" href="https://i.ytimg.com" />
+    <link rel="dns-prefetch" href="https://www.youtube.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500&display=swap"
       rel="stylesheet"
@@ -1507,6 +1510,7 @@
         wantPlay = true,
         playing = false,
         progTimer = null;
+      let userInteracted = false;
       let videoModalOpen = false;
       let currentAdminTab = "photos";
 
@@ -1651,7 +1655,7 @@
               document.getElementById("durTime").textContent = fmt(
                 e.target.getDuration(),
               );
-              if (wantPlay) e.target.playVideo();
+              if (wantPlay || userInteracted) e.target.playVideo();
             },
             onStateChange: (e) => {
               if (e.data === YT.PlayerState.PLAYING) {
@@ -1727,17 +1731,22 @@
         );
       }
       // Browsers block autoplay-with-sound until a user gesture. This ensures
-      // the very first tap/click anywhere on the page starts the song, even
-      // if the YouTube player wasn't ready yet at that exact moment.
-      let userInteracted = false;
+      // any tap/click anywhere on the page starts the song immediately, even
+      // if the YouTube player wasn't ready yet at that exact moment. We keep
+      // listening (not 'once') until playback actually begins, so an early
+      // tap before the player loads isn't wasted.
       function tryStartOnInteraction() {
         userInteracted = true;
-        if (ytReady && ytPlayer && !playing) ytPlayer.playVideo();
+        if (ytReady && ytPlayer && !playing) {
+          ytPlayer.playVideo();
+        }
+        if (playing) {
+          document.removeEventListener("click", tryStartOnInteraction);
+          document.removeEventListener("touchstart", tryStartOnInteraction);
+        }
       }
-      document.addEventListener("click", tryStartOnInteraction, { once: true });
-      document.addEventListener("touchstart", tryStartOnInteraction, {
-        once: true,
-      });
+      document.addEventListener("click", tryStartOnInteraction);
+      document.addEventListener("touchstart", tryStartOnInteraction);
 
       // ===== SLIDESHOW =====
       function buildSlideshow(photos) {
